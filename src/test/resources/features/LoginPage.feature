@@ -5,7 +5,7 @@ Feature: Login Page Feature
 
   @SIT
   Scenario: Login with correct credentials
-    When user enters username "test@gmail.com"
+    When user enters username "test@mmail.com"
     And user enters password "password123"
     And user clicks on login button
     Then user gets the title of the page

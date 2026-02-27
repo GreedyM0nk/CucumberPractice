@@ -12,7 +12,8 @@ import io.cucumber.junit.CucumberOptions;
                 "pretty", // Prints readable logs in console
                 "html:target/cucumber-reports/cucumber.html", // Standard HTML report
                 "json:target/cucumber-reports/cucumber.json", // JSON report for CI/CD
-                "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:" // Extent Reports
+                "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:", // Extent Reports
+                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm" // <--- Adds Allure
         },
         monochrome = true // Clean console output
 )

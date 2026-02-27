@@ -10,13 +10,13 @@ public class LoginPage {
     private WebDriver driver;
 
     // 1. By Locators (Page Factory)
-    @FindBy(id = "CustomerEmail")
+    @FindBy(id = "customer_email")
     private WebElement emailId;
 
-    @FindBy(id = "CustomerPassword")
+    @FindBy(id = "customer_password")
     private WebElement password;
 
-    @FindBy(xpath = "//button[contains(text(), 'Sign in')]")
+    @FindBy(xpath = "//input[@value=\"Sign In\"]")
     // Note: Verify this xpath on the specific Shopify theme, it might vary.
     private WebElement signInButton;
 
