@@ -1,10 +1,22 @@
+### Build & Dependencies ###
 target/
+build/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-.kotlin
+!**/src/main/**/build/
+!**/src/test/**/build/
+.mvn/
 
-### IntelliJ IDEA ###
+### Test & Report Outputs ###
+test-output/
+allure-results/
+allure-report/
+*.log
+cucumber-reports/
+
+### IDE & Editor ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -12,6 +24,14 @@ target/
 *.iws
 *.iml
 *.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.c9/
+
+### Language ###
+.kotlin
 
 ### Eclipse ###
 .apt_generated
@@ -28,12 +48,26 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
-
-### Mac OS ###
+### System Files ###
 .DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+### Archives ###
+*.jar
+*.zip
+*.tar.gz
+
+### Temporary Files ###
+*.tmp
+*.temp
+*.cache
+.allure/
+
+### Maven ###
+mvnw
+mvnw.cmd
+
+
