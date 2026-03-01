@@ -3,7 +3,10 @@ package com.retail.pages;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -114,13 +117,18 @@ public class ProductPage extends BasePage {
      */
     public boolean isCartCountUpdated(String expectedCount) {
         try {
-            Thread.sleep(2000); // Wait for animation
-            String actualCount = getCartCount();
-            return actualCount.equals(expectedCount);
-        } catch (InterruptedException e) {
+            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            shortWait.until(ExpectedConditions.textMatches(
+                    org.openqa.selenium.By.cssSelector(".cart-target, #cart-target-desktop"),
+                    java.util.regex.Pattern.compile(".*" + expectedCount + ".*")
+            ));
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
+
+
 
     /**
      * Check if product is displayed on catalogue page

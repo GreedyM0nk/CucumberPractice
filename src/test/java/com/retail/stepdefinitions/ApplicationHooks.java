@@ -13,7 +13,6 @@ import io.cucumber.java.Scenario;
 public class ApplicationHooks {
 
     private DriverFactory driverFactory;
-    private WebDriver driver;
     private ConfigReader configReader;
     Properties prop;
 
@@ -26,21 +25,33 @@ public class ApplicationHooks {
     @Before(order = 1)
     public void launchBrowser() {
         driverFactory = new DriverFactory();
-        driver = driverFactory.init_driver(prop);
+        driverFactory.init_driver(prop);
     }
 
-    @After(order = 0)
-    public void quitBrowser() {
-        driver.quit();
-    }
-
+    /**
+     * Take screenshot BEFORE quitting the browser.
+     * Lower order number runs FIRST in @After, so order=1 runs before order=0.
+     */
     @After(order = 1)
     public void tearDown(Scenario scenario) {
-        if (scenario.isFailed()) {
-            // take screenshot:
+        WebDriver driver = DriverFactory.getDriver();
+        if (scenario.isFailed() && driver != null) {
+            // take screenshot before browser is closed
             String screenshotName = scenario.getName().replaceAll(" ", "_");
             byte[] sourcePath = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
             scenario.attach(sourcePath, "image/png", screenshotName);
+        }
+    }
+
+    /**
+     * Quit browser last (order=0 runs after order=1 in @After hooks).
+     */
+    @After(order = 0)
+    public void quitBrowser() {
+        WebDriver driver = DriverFactory.getDriver();
+        if (driver != null) {
+            driver.quit();
+            DriverFactory.tlDriver.remove(); // clean up ThreadLocal to prevent leaks
         }
     }
 }
