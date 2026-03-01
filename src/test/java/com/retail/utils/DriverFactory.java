@@ -1,9 +1,13 @@
 package com.retail.utils;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import java.time.Duration;
 import java.util.Properties;
@@ -14,15 +18,36 @@ public class DriverFactory {
 
     public WebDriver init_driver(Properties prop) {
         String browserName = prop.getProperty("browser").trim();
+        boolean headless = Boolean.parseBoolean(prop.getProperty("headless", "false"));
 
         System.out.println("Browser name is: " + browserName);
+        System.out.println("Headless mode: " + headless);
 
         if (browserName.equalsIgnoreCase("chrome")) {
-            tlDriver.set(new ChromeDriver());
+            WebDriverManager.chromedriver().setup();
+            ChromeOptions options = new ChromeOptions();
+            if (headless) {
+                options.addArguments("--headless=new");
+            }
+            options.addArguments("--disable-blink-features=AutomationControlled");
+            options.addArguments("--disable-extensions");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            tlDriver.set(new ChromeDriver(options));
         } else if (browserName.equalsIgnoreCase("firefox")) {
-            tlDriver.set(new FirefoxDriver());
+            WebDriverManager.firefoxdriver().setup();
+            FirefoxOptions options = new FirefoxOptions();
+            if (headless) {
+                options.addArguments("--headless");
+            }
+            tlDriver.set(new FirefoxDriver(options));
         } else if (browserName.equalsIgnoreCase("edge")) {
-            tlDriver.set(new EdgeDriver());
+            WebDriverManager.edgedriver().setup();
+            EdgeOptions options = new EdgeOptions();
+            if (headless) {
+                options.addArguments("--headless=new");
+            }
+            tlDriver.set(new EdgeDriver(options));
         } else {
             System.out.println("Please pass the correct browser name: " + browserName);
         }

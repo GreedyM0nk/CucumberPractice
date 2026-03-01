@@ -252,4 +252,4 @@ This project is licensed under the MIT License.
 ---
 
 **Maintainer:** Souvik Dutta  
-**Last Updated:** February 2026
+**Last Updated:** March 2026

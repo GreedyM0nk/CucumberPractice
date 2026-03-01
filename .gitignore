@@ -15,12 +15,30 @@ allure-report/
 *.log
 cucumber-reports/
 
+### Test Data (Sensitive) ###
+**/testdata/*-local.json
+**/testdata/*-private.json
+**/testdata/credentials*.json
+
+### Environment Configs ###
+**/config/config-local.properties
+**/config/*-prod.properties
+
+### Driver binaries ###
+**/drivers/
+*.exe
+chromedriver
+geckodriver
+msedgedriver
+
 ### IDE & Editor ###
 .idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/workspace.xml
+.idea/usage.statistics.xml
 *.iws
 *.iml
 *.ipr
