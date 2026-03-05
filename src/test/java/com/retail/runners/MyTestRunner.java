@@ -6,8 +6,8 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        features = {"src/test/resources/features"}, // Location of Feature files
-        glue = {"com.retail.stepdefinitions", "com.retail.runners"}, // Location of Step Definitions & Hooks
+        features = {"src/test/resources/features"},
+        glue = {"com.retail.stepdefinitions"}, // Only step definitions & hooks — NOT runners
         plugin = {
                 "pretty", // Prints readable logs in console
                 "html:target/cucumber-reports/cucumber.html", // Standard HTML report

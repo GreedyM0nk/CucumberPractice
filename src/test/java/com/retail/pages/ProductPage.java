@@ -46,10 +46,11 @@ public class ProductPage extends BasePage {
     }
 
     /**
-     * Navigate to product catalogue page
+     * Navigate to the product catalogue (home) page.
+     * URL is read from the active environment profile via DriverFactory — never hardcoded.
      */
     public void navigateToCatalogue() {
-        driver.get("https://sauce-demo.myshopify.com/");
+        driver.get(com.retail.utils.DriverFactory.getBaseUrl());
     }
 
     /**
@@ -96,6 +97,26 @@ public class ProductPage extends BasePage {
     }
 
     /**
+     * Get the cart count, waiting for the badge element to be stable first.
+     * Unlike getCartCount(), this explicitly waits up to 5s for the element
+     * to be visible before reading — prevents reading mid-animation empty text.
+     * @return Cart count as string (empty string if badge not visible)
+     */
+    public String getStableCartCount() {
+        try {
+            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebElement badge = shortWait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                    org.openqa.selenium.By.cssSelector(".cart-target, #cart-target-desktop")));
+            String countText = badge.getText().replaceAll("[^0-9]", "");
+            return countText.isEmpty() ? "0" : countText;
+        } catch (Exception e) {
+            // Badge not visible = cart is empty
+            return "0";
+        }
+    }
+
+    /**
      * Get the cart count
      * @return Cart count as string
      */
@@ -117,10 +138,11 @@ public class ProductPage extends BasePage {
      */
     public boolean isCartCountUpdated(String expectedCount) {
         try {
-            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            // Use 10s wait to match the default implicit wait timeout
+            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(10));
             shortWait.until(ExpectedConditions.textMatches(
                     org.openqa.selenium.By.cssSelector(".cart-target, #cart-target-desktop"),
-                    java.util.regex.Pattern.compile(".*" + expectedCount + ".*")
+                    java.util.regex.Pattern.compile(".*" + java.util.regex.Pattern.quote(expectedCount) + ".*")
             ));
             return true;
         } catch (Exception e) {

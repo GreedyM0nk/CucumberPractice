@@ -63,11 +63,12 @@ public class ProductPageSteps {
 
     @When("user adds the first product to cart")
     public void user_adds_the_first_product_to_cart() {
-        // Store initial cart count
-        initialCartCount = getProductPage().getCartCount();
+        // Capture the stable cart count BEFORE any navigation.
+        // Use getStableCartCount() which waits for the badge to settle.
+        initialCartCount = getProductPage().getStableCartCount();
         System.out.println("Initial cart count: " + initialCartCount);
 
-        // Click on first product
+        // Click on first product → navigates to product detail page
         user_clicks_on_the_first_product();
 
         // Add to cart
@@ -77,9 +78,9 @@ public class ProductPageSteps {
 
     @When("user adds product to cart")
     public void user_adds_product_to_cart() {
-        // Capture cart count before adding (needed for cart_count_should_be_updated)
+        // Capture stable count before adding (needed for cart_count_should_be_updated)
         if (initialCartCount == null) {
-            initialCartCount = getProductPage().getCartCount();
+            initialCartCount = getProductPage().getStableCartCount();
         }
         getProductPage().addToCart();
     }
@@ -113,9 +114,13 @@ public class ProductPageSteps {
 
     @Then("product should be visible in cart")
     public void product_should_be_visible_in_cart() {
-        int cartCount = getCartPage().getCartItemCount();
-        Assert.assertTrue("Cart should not be empty", cartCount > 0);
-        System.out.println("Items in cart: " + cartCount);
+        // Re-read the cart badge on the current page (product detail page).
+        // We use productPage because we are already on the product detail page
+        // and CartPage.getCartItemCount() would race with the cart animation.
+        String countStr = getProductPage().getCartCount();
+        int cartCount = countStr.isEmpty() ? 0 : Integer.parseInt(countStr);
+        Assert.assertTrue("Cart should not be empty – badge shows: " + countStr, cartCount > 0);
+        System.out.println("Cart badge count confirmed: " + cartCount);
     }
 
     @Then("user should see {int} product in the catalogue")

@@ -12,46 +12,45 @@ import io.cucumber.java.Scenario;
 
 public class ApplicationHooks {
 
-    private DriverFactory driverFactory;
-    private ConfigReader configReader;
-    Properties prop;
-
+    /**
+     * Combined @Before: load properties then launch browser in a single hook.
+     * Using a single method with all setup avoids any shared-field race between
+     * two separate @Before hooks when scenarios run in parallel threads.
+     * order=0 → runs first before any other @Before hooks.
+     */
     @Before(order = 0)
-    public void getProperty() {
-        configReader = new ConfigReader();
-        prop = configReader.init_prop();
-    }
-
-    @Before(order = 1)
-    public void launchBrowser() {
-        driverFactory = new DriverFactory();
-        driverFactory.init_driver(prop);
+    public void setUp() {
+        // Local variable — never shared across threads or scenarios
+        Properties prop = new ConfigReader().init_prop();
+        new DriverFactory().init_driver(prop);
     }
 
     /**
      * Take screenshot BEFORE quitting the browser.
-     * Lower order number runs FIRST in @After, so order=1 runs before order=0.
+     * In Cucumber @After hooks, HIGHER order number runs FIRST.
+     * order=1 → runs first (screenshot), order=0 → runs last (quit).
      */
     @After(order = 1)
-    public void tearDown(Scenario scenario) {
+    public void takeScreenshotOnFailure(Scenario scenario) {
         WebDriver driver = DriverFactory.getDriver();
         if (scenario.isFailed() && driver != null) {
-            // take screenshot before browser is closed
             String screenshotName = scenario.getName().replaceAll(" ", "_");
-            byte[] sourcePath = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-            scenario.attach(sourcePath, "image/png", screenshotName);
+            byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+            scenario.attach(screenshot, "image/png", screenshotName);
         }
     }
 
     /**
-     * Quit browser last (order=0 runs after order=1 in @After hooks).
+     * Quit the browser and clean up the ThreadLocal slot.
+     * order=0 → runs last, after the screenshot has been captured.
      */
     @After(order = 0)
     public void quitBrowser() {
         WebDriver driver = DriverFactory.getDriver();
         if (driver != null) {
             driver.quit();
-            DriverFactory.tlDriver.remove(); // clean up ThreadLocal to prevent leaks
+            DriverFactory.removeDriver(); // prevent ThreadLocal memory leak
         }
     }
 }
+

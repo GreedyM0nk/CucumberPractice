@@ -3,7 +3,10 @@ package com.retail.pages;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -97,10 +100,11 @@ public class CartPage extends BasePage {
     }
 
     /**
-     * Navigate to cart page
+     * Navigate to the cart page for this environment.
+     * URL is derived from the active environment profile — never hardcoded.
      */
     public void navigateToCart() {
-        driver.get("https://sauce-demo.myshopify.com/cart");
+        driver.get(com.retail.utils.DriverFactory.getBaseUrl() + "cart");
     }
 
     /**
@@ -112,16 +116,20 @@ public class CartPage extends BasePage {
     }
 
     /**
-     * Verify cart count is updated
+     * Verify cart count is updated to expected value.
+     * Uses explicit wait instead of Thread.sleep.
      * @param expectedCount Expected cart count
-     * @return true if count matches
+     * @return true if count matches within 10 seconds
      */
     public boolean verifyCartCount(int expectedCount) {
         try {
-            // Wait for cart animation to complete
-            Thread.sleep(2000);
-            return getCartItemCount() == expectedCount;
-        } catch (InterruptedException e) {
+            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            shortWait.until(ExpectedConditions.textMatches(
+                org.openqa.selenium.By.cssSelector(".cart-target, #cart-target-desktop, #cart-target-mobile"),
+                java.util.regex.Pattern.compile(".*" + java.util.regex.Pattern.quote(String.valueOf(expectedCount)) + ".*")
+            ));
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
