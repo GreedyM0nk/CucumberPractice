@@ -43,11 +43,16 @@ public class DriverFactory {
                 WebDriverManager.chromedriver().setup();
             }
             ChromeOptions options = new ChromeOptions();
-            if (headless) options.addArguments("--headless=new");
+            // Always-on stability flags
             options.addArguments("--disable-blink-features=AutomationControlled");
             options.addArguments("--disable-extensions");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
+            if (headless) {
+                // Required for CI/CD environments (e.g. GitHub Actions / Linux with no display)
+                options.addArguments("--headless=new");
+                options.addArguments("--no-sandbox");
+                options.addArguments("--disable-dev-shm-usage");
+                options.addArguments("--window-size=1920,1080");
+            }
             tlDriver.set(new ChromeDriver(options));
 
         } else if (browserName.equalsIgnoreCase("firefox")) {

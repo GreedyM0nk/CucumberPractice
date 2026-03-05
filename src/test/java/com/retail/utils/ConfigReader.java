@@ -8,11 +8,11 @@ import java.util.Properties;
  * Loads the two-layer configuration:
  *   1. config.properties        – browser, implicitWait, headless, etc. (shared across envs)
  *   2. config-<env>.properties  – url, username, password  (environment-specific)
- *
+
  * The active environment is resolved in this priority order:
  *   1. JVM system property  -Denv=<name>   (set by Maven Surefire from the active profile)
  *   2. The `env` key inside config.properties  (fallback, defaults to "uat")
- *
+
  * To switch environments from the command line:
  *   mvn test -Puat    →  loads config-uat.properties
  *   mvn test -Psit    →  loads config-sit.properties
@@ -48,6 +48,15 @@ public class ConfigReader {
             try (FileInputStream envFile = new FileInputStream(
                     "./src/test/resources/config/config-" + envName + ".properties")) {
                 properties.load(envFile);
+            }
+
+            // 4. Allow -Dheadless=true JVM system property to override config.properties.
+            //    This lets CI/CD (e.g. GitHub Actions) enable headless mode without
+            //    touching any properties file:  mvn test -Dheadless=true
+            String headlessSysProp = System.getProperty("headless");
+            if (headlessSysProp != null && !headlessSysProp.isBlank()) {
+                properties.setProperty("headless", headlessSysProp);
+                System.out.println("[ConfigReader] headless overridden by system property: " + headlessSysProp);
             }
 
         } catch (IOException e) {
