@@ -1,0 +1,5 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","9198","Verify products are displayed on catalogue page","","Thu Mar 05 18:03:51 UTC 2026","skipped","Thu Mar 05 18:04:01 UTC 2026","","Add Product to Cart","Verify products are displayed on catalogue page",""
+"","9037","Add first product to cart from catalogue page","","Thu Mar 05 18:03:51 UTC 2026","skipped","Thu Mar 05 18:04:01 UTC 2026","","Add Product to Cart","Add first product to cart from catalogue page",""
+"","9169","View first product details","","Thu Mar 05 18:03:51 UTC 2026","skipped","Thu Mar 05 18:04:00 UTC 2026","","Add Product to Cart","View first product details",""
+"","9086","Add product to cart from product details page","","Thu Mar 05 18:03:51 UTC 2026","skipped","Thu Mar 05 18:04:00 UTC 2026","","Add Product to Cart","Add product to cart from product details page",""
