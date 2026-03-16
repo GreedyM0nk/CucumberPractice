@@ -9,9 +9,10 @@ A comprehensive **Behavior Driven Development (BDD)** test automation framework 
 - ✅ **BrowserStack Integration** - Cloud-based cross-browser testing
 - ✅ **Page Object Model** - Scalable and maintainable architecture
 - ✅ **Multi-Environment Support** - SIT, UAT, PROD configurations
-- ✅ **Advanced Reporting** - Extent Reports & Allure Reports
-- ✅ **Parallel Execution** - 4 runners with multi-browser support
+- ✅ **Advanced Reporting** - Allure Reports with GitHub Pages deployment
+- ✅ **Parallel Execution** - 5 test runners executing simultaneously
 - ✅ **Comprehensive Logging** - SLF4J with Log4j 2.x
+- ✅ **Security Patched** - CVE-2025-4641, GHSA-72hv-8253-57qq fixed
 
 ## 🛠 Tech Stack
 
@@ -33,11 +34,14 @@ RetailAutomation
 ├── src/test/java
 │   ├── com.retail.pages           # Page Objects (Locators & Actions)
 │   ├── com.retail.stepdefinitions # Cucumber Step Definitions
-│   ├── com.retail.runners         # JUnit Test Runners (ParallelRunner1-4)
+│   ├── com.retail.runners         # JUnit Test Runners (ParallelRunner1-5)
 │   ├── com.retail.utils           # DriverFactory, ConfigReader
 │   └── restAssured                # REST Assured API Tests
 ├── src/test/resources
-│   ├── features/product           # Gherkin Feature Files
+│   ├── features/
+│   │   ├── authentication/        # Login & authentication tests
+│   │   ├── product/               # Product browsing tests
+│   │   └── header/                # Header/footer component tests
 │   ├── config/                    # Environment Properties (SIT, UAT, PROD)
 │   ├── testdata/                  # JSON test data files
 │   └── *.xml, *.properties        # Logging & Report Config
@@ -145,40 +149,39 @@ mvn test -Dtest=ParallelRunner1
 
 | Tag | Scenario | Runner |
 |-----|----------|--------|
-| `@S1` | Add first product to cart (Smoke) | ParallelRunner1 |
-| `@S2` | View product details (Regression) | ParallelRunner2 |
-| `@S3` | Verify products displayed | ParallelRunner3 |
-| `@S4` | Add from details page (Smoke) | ParallelRunner4 |
+| `@S1` | Add first product to cart | ParallelRunner1 |
+| `@S2` | Product filtering & details | ParallelRunner2 |
+| `@S3` | Checkout flow & payment | ParallelRunner3 |
+| `@S4` | Login & authentication | ParallelRunner4 |
+| `@S5` | Footer navigation & links | ParallelRunner5 |
 
-#### Running Multiple Scenarios on Cloud
+#### Parallel Test Runners
+
+Your framework has 5 parallel runners executing simultaneously:
+
+- **ParallelRunner1 (@S1)** - Add products to cart tests
+- **ParallelRunner2 (@S2)** - Product filtering & browsing tests
+- **ParallelRunner3 (@S3)** - Checkout flow tests
+- **ParallelRunner4 (@S4)** - Login & authentication tests
+- **ParallelRunner5 (@S5)** - Footer & header component tests
+
+Each runner executes in its own JVM fork with independent browser instances.
+
+#### Running Specific Tests
 
 ```bash
-# Set credentials
-export BROWSERSTACK_USERNAME=souvikdutta_kjl3bT
-export BROWSERSTACK_ACCESS_KEY=pk6zemKnxPqzhh4MRevy
+# Run specific parallel runner
+mvn test -Dtest=ParallelRunner1    # Run @S1 tests
+mvn test -Dtest=ParallelRunner5    # Run @S5 footer tests
 
-# Run all @Smoke tests
-mvn test -Dcucumber.filter.tags="@Smoke"
-
-# Run all @Product tests
-mvn test -Dcucumber.filter.tags="@Product"
-
-# Run @Product AND @Cart tests
-mvn test -Dcucumber.filter.tags="@Product and @Cart"
-
-# Run all tests (default)
+# Run all tests in parallel
 mvn clean test
+
+# Run on specific environment
+mvn clean test -Puat   # UAT (default)
+mvn clean test -Psit   # SIT
+mvn clean test -Pprod  # PROD
 ```
-
-#### Understanding the Parallel Runners
-
-Your framework has 4 parallel runners:
-- **ParallelRunner1** - Executes @S1 tags
-- **ParallelRunner2** - Executes @S2 tags
-- **ParallelRunner3** - Executes @S3 tags
-- **ParallelRunner4** - Executes @S4 tags
-
-Each runner can target different browsers/devices via `browserstack.yml`.
 
 ### 🤖 Run Tests via GitHub Actions (CI/CD)
 
