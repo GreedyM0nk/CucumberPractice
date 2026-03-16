@@ -37,9 +37,16 @@ public class DriverFactory {
      */
     public WebDriver init_driver(Properties prop) {
         String browserName = prop.getProperty("browser").trim();
-        boolean headless = Boolean.parseBoolean(prop.getProperty("headless", "false"));
+        
+        // Check if running in CI environment (GitHub Actions, etc.)
+        boolean isCIEnvironment = Boolean.parseBoolean(System.getenv("CI")) || 
+                                  Boolean.parseBoolean(System.getenv("HEADLESS"));
+        
+        // Read headless from properties, but override with CI environment
+        boolean headless = isCIEnvironment || Boolean.parseBoolean(prop.getProperty("headless", "false"));
 
         System.out.println("Browser name is: " + browserName);
+        System.out.println("CI Environment: " + isCIEnvironment);
         System.out.println("Headless mode: " + headless);
 
         // Check if BrowserStack credentials are available (Priority order):
@@ -128,10 +135,12 @@ public class DriverFactory {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--disable-blink-features=AutomationControlled");
             options.addArguments("--disable-extensions");
+            
             if (headless) {
                 options.addArguments("--headless=new");
                 options.addArguments("--no-sandbox");
                 options.addArguments("--disable-dev-shm-usage");
+                options.addArguments("--disable-gpu");
                 options.addArguments("--window-size=1920,1080");
             }
             return new ChromeDriver(options);
