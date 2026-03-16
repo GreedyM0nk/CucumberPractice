@@ -1,0 +1,5 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"skipped","Mon Mar 16 08:29:23 UTC 2026","Mon Mar 16 08:29:27 UTC 2026","3585","","Add Product to Cart","","Add first product to cart from catalogue page","","Add first product to cart from catalogue page",""
+"skipped","Mon Mar 16 08:29:23 UTC 2026","Mon Mar 16 08:29:27 UTC 2026","3565","","Add Product to Cart","","Add product to cart from product details page","","Add product to cart from product details page",""
+"skipped","Mon Mar 16 08:29:23 UTC 2026","Mon Mar 16 08:29:27 UTC 2026","3692","","Add Product to Cart","","View first product details","","View first product details",""
+"skipped","Mon Mar 16 08:29:23 UTC 2026","Mon Mar 16 08:29:27 UTC 2026","3656","","Add Product to Cart","","Verify products are displayed on catalogue page","","Verify products are displayed on catalogue page",""
