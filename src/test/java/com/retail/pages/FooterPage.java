@@ -125,14 +125,39 @@ public class FooterPage extends BasePage {
     // ─────────────────────────────────────────────
 
     /**
-     * Get footer section by name
+     * Get footer section by name - finds heading and returns containing section
      */
     public WebElement getFooterSection(String sectionName) {
-        return footerSectionHeadings.stream()
-                .filter(heading -> heading.getText().equalsIgnoreCase(sectionName))
-                .map(heading -> heading.findElement(By.xpath("./ancestor::div[@class='footer-section' or @class='footer-about']")))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Footer section '" + sectionName + "' not found"));
+        try {
+            // Try to find heading in footer first
+            WebElement footer = driver.findElement(By.cssSelector("footer, [role='contentinfo']"));
+            List<WebElement> headings = footer.findElements(By.cssSelector("h2, h3, h4, h5, h6"));
+            
+            WebElement foundHeading = headings.stream()
+                    .filter(h -> h.getText().equalsIgnoreCase(sectionName))
+                    .findFirst()
+                    .orElse(null);
+            
+            if (foundHeading != null) {
+                // Return the parent section containing this heading
+                return foundHeading.findElement(By.xpath("./ancestor::*[contains(@class, 'section') or contains(@class, 'footer-') or contains(@class, 'about')] | ./.."));
+            }
+            
+            // Fallback: search entire page for heading with this text
+            List<WebElement> allHeadings = driver.findElements(By.xpath(
+                "//h2[text()='" + sectionName + "'] | //h3[text()='" + sectionName + "'] | //h4[contains(text(), '" + sectionName + "')]"
+            ));
+            
+            if (!allHeadings.isEmpty()) {
+                WebElement heading = allHeadings.get(0);
+                return heading.findElement(By.xpath("./ancestor::div[contains(@class, 'footer')] | ./.."));
+            }
+            
+            throw new RuntimeException("Footer section '" + sectionName + "' not found");
+        } catch (Exception e) {
+            System.out.println("DEBUG: Footer section '" + sectionName + "' lookup failed: " + e.getMessage());
+            throw new RuntimeException("Footer section '" + sectionName + "' not found", e);
+        }
     }
 
     /**

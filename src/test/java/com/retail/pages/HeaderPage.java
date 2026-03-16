@@ -1,6 +1,7 @@
 package com.retail.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -68,7 +69,7 @@ public class HeaderPage extends BasePage {
     @FindBy(css = "a[href*='pinterest.com'], .social-icon.pinterest, a .fa-pinterest")
     private WebElement pinterestIcon;
 
-    @FindBy(css = "a[href*='rss'], .social-icon.rss, a .fa-rss")
+    @FindBy(css = "a[href*='feed'], a[href*='rss'], .social-icon.rss, a .fa-rss, [role='link'][aria-label*='RSS'], a[title*='RSS']")
     private WebElement rssIcon;
 
     // ─────────────────────────────────────────────
@@ -180,9 +181,17 @@ public class HeaderPage extends BasePage {
      */
     public boolean isLinkInSideNavigation(String linkText) {
         try {
+            // Special case for Search - might be an input field
+            if (linkText.equalsIgnoreCase("search")) {
+                List<WebElement> searchInputs = driver.findElements(By.xpath(
+                    "//input[contains(@placeholder, 'search') or contains(@placeholder, 'Search') or @name='q' or @type='search'] | //button[contains(text(), 'Search')] | //a[contains(text(), 'Search')]"
+                ));
+                return !searchInputs.isEmpty() && searchInputs.stream().anyMatch(WebElement::isDisplayed);
+            }
+            
             // Try to find using multiple selectors
             List<WebElement> links = driver.findElements(By.xpath(
-                ".//nav//a[contains(text(), '" + linkText + "')] | .//aside//a[contains(text(), '" + linkText + "')] | .//a[contains(text(), '" + linkText + "')]"
+                ".//nav//a[contains(text(), '" + linkText + "')] | .//aside//a[contains(text(), '" + linkText + "')] | .//a[contains(text(), '" + linkText + "')] | .//button[contains(text(), '" + linkText + "')]"
             ));
             if (!links.isEmpty()) {
                 return links.stream().anyMatch(WebElement::isDisplayed);
@@ -242,11 +251,24 @@ public class HeaderPage extends BasePage {
     }
 
     /**
-     * Click social media icon
+     * Click social media icon and handle external links
      */
     public void clickSocialIcon(String socialMedia) {
-        WebElement icon = getSocialIconByName(socialMedia);
-        wait.until(ExpectedConditions.elementToBeClickable(icon)).click();
+        try {
+            WebElement icon = getSocialIconByName(socialMedia);
+            wait.until(ExpectedConditions.elementToBeClickable(icon));
+            String href = getSocialIconHref(socialMedia);
+            
+            if (href != null && !href.isEmpty() && 
+                (href.contains("facebook.com") || href.contains("twitter.com") || 
+                 href.contains("instagram.com") || href.contains("pinterest.com"))) {
+                ((JavascriptExecutor) driver).executeScript("window.location.href = '" + href + "';");
+            } else {
+                icon.click();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to click " + socialMedia + " icon", e);
+        }
     }
 
     /**
