@@ -18,7 +18,8 @@ import io.cucumber.junit.CucumberOptions;
                 "html:target/cucumber-reports/smoke-report.html",
                 "json:target/cucumber-reports/smoke-report.json",
                 "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:",
-                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
+                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm",
+
         },
         monochrome = true,
         dryRun = false

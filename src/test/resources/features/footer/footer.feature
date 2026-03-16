@@ -8,7 +8,7 @@ Feature: Footer Navigation and Content Verification
   # FOOTER – Footer Navigation Section
   # ─────────────────────────────────────────────
 
-  @S5
+  @Smoke @S5
   Scenario: Verify footer displays the "Footer" section heading
     Then I should see the heading "Footer" in the footer navigation section
 

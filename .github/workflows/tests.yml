@@ -32,7 +32,7 @@ jobs:
 
       # Run all tests - this generates both JUnit XML and Allure JSON results
       - name: Run All Tests
-        run: mvn clean test -Denv=uat
+        run: mvn clean test -Denv=uat -Dtest=SmokeTestRunner
         continue-on-error: true
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}

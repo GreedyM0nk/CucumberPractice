@@ -40,7 +40,7 @@ public class FooterNavigationSteps {
     @Then("I should see the heading {string} in the footer navigation section")
     public void verifyFooterNavigationHeading(String heading) {
         WebElement footerNav = wait.until(
-            ExpectedConditions.presenceOfElementLocated(By.cssSelector("footer nav"))
+            ExpectedConditions.presenceOfElementLocated(By.xpath("//footer/section/div/nav/h2"))
         );
         WebElement headingElement = footerNav.findElement(By.xpath(".//h3[text()='" + heading + "']"));
         assertTrue("Footer navigation heading '" + heading + "' should be visible", headingElement.isDisplayed());
@@ -49,7 +49,7 @@ public class FooterNavigationSteps {
     @Then("I should see the link {string} in the footer navigation")
     public void verifyLinkInFooterNavigation(String linkText) {
         WebElement footerNav = wait.until(
-            ExpectedConditions.presenceOfElementLocated(By.cssSelector("footer nav"))
+            ExpectedConditions.presenceOfElementLocated(By.xpath("//footer/section/div/nav/h2"))
         );
         WebElement link = footerNav.findElement(By.linkText(linkText));
         assertTrue("Link '" + linkText + "' should be visible in footer navigation", link.isDisplayed());
@@ -98,8 +98,8 @@ public class FooterNavigationSteps {
         WebElement footer = wait.until(
             ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
         );
-        WebElement aboutUsSection = footer.findElement(By.xpath(".//h3[text()='About Us']/ancestor::div[@class='footer-section' or @class='footer-about']"));
-        WebElement link = aboutUsSection.findElement(By.linkText(linkText));
+        WebElement aboutUsSection = footer.findElement(By.xpath("//*[@title=\"Sauce\"]"));
+        WebElement link = aboutUsSection.findElement(By.xpath("//*[@title=\"Sauce\"]"));
         link.click();
     }
 

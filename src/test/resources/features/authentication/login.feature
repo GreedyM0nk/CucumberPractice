@@ -5,7 +5,7 @@ Feature: Authentication - Login and Signup on Sauce Demo Store
   Background:
     Given user is on the home page
 
-  @Authentication @Signup
+  @Smoke @Authentication @Signup
   Scenario: User signs up with a new account
     When user clicks on sign up link
     And user enters first name for signup
@@ -16,7 +16,7 @@ Feature: Authentication - Login and Signup on Sauce Demo Store
     Then user account should be created successfully
     And user should be logged in
 
-  @Authentication @Login
+  @Smoke @Authentication @Login
   Scenario: User logs in with existing credentials
     When user clicks on login link
     And user enters email for login
