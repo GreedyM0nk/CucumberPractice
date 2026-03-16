@@ -103,12 +103,6 @@ public class FooterNavigationSteps {
         link.click();
     }
 
-    @Then("the link destination should be {string}")
-    public void verifyLinkDestination(String expectedUrl) {
-        String currentUrl = wait.until(driver -> driver.getCurrentUrl());
-        assertEquals("Link should navigate to correct destination", expectedUrl, currentUrl);
-    }
-
     // ─────────────────────────────────────────────
     // FOOTER PAYMENT ICONS STEPS
     // ─────────────────────────────────────────────

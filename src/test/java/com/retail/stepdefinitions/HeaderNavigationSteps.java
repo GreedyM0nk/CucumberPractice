@@ -129,13 +129,6 @@ public class HeaderNavigationSteps {
         headerPage.clickSocialIcon(socialMedia);
     }
 
-    @Then("the link destination should be {string}")
-    public void verifyLinkDestination(String expectedUrl) {
-        String currentUrl = webDriver.getCurrentUrl();
-        Assert.assertTrue(currentUrl.contains(expectedUrl) || currentUrl.equals(expectedUrl),
-                "Link destination does not match. Expected: " + expectedUrl + ", Got: " + currentUrl);
-    }
-
     // ─────────────────────────────────────────────
     // GENERAL HEADER SETUP STEPS
     // ─────────────────────────────────────────────

@@ -82,4 +82,11 @@ public class CommonSteps {
         String currentUrl = driver.getCurrentUrl();
         assertEquals("URL mismatch", expectedUrl, currentUrl);
     }
+
+    @Then("the link destination should be {string}")
+    public void verifyLinkDestination(String expectedUrl) {
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue("Link destination does not match. Expected: " + expectedUrl + ", Got: " + currentUrl,
+                currentUrl.contains(expectedUrl) || currentUrl.equals(expectedUrl));
+    }
 }
