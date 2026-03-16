@@ -1,6 +1,5 @@
 package com.retail.utils;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -8,9 +7,13 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.URL;
 import java.time.Duration;
 import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DriverFactory {
 
@@ -28,8 +31,9 @@ public class DriverFactory {
 
     /**
      * Creates a new WebDriver for the current thread and stores it in ThreadLocal.
-     * WebDriverManager.setup() calls are synchronized to prevent concurrent
-     * binary-download races when multiple threads initialise at the same time.
+     *
+     * Checks for BrowserStack environment variables and routes to cloud if present.
+     * Falls back to local WebDriver instantiation if not.
      */
     public WebDriver init_driver(Properties prop) {
         String browserName = prop.getProperty("browser").trim();
@@ -38,47 +42,21 @@ public class DriverFactory {
         System.out.println("Browser name is: " + browserName);
         System.out.println("Headless mode: " + headless);
 
-        if (browserName.equalsIgnoreCase("chrome")) {
-            synchronized (DriverFactory.class) {
-                WebDriverManager.chromedriver().setup();
-            }
-            ChromeOptions options = new ChromeOptions();
-            // Always-on stability flags
-            options.addArguments("--disable-blink-features=AutomationControlled");
-            options.addArguments("--disable-extensions");
-            if (headless) {
-                // Required for CI/CD environments (e.g. GitHub Actions / Linux with no display)
-                options.addArguments("--headless=new");
-                options.addArguments("--no-sandbox");
-                options.addArguments("--disable-dev-shm-usage");
-                options.addArguments("--window-size=1920,1080");
-            }
-            tlDriver.set(new ChromeDriver(options));
+        // Check if BrowserStack credentials are available
+        String bsUsername = System.getenv("BROWSERSTACK_USERNAME");
+        String bsAccessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
 
-        } else if (browserName.equalsIgnoreCase("firefox")) {
-            synchronized (DriverFactory.class) {
-                WebDriverManager.firefoxdriver().setup();
-            }
-            FirefoxOptions options = new FirefoxOptions();
-            if (headless) options.addArguments("--headless");
-            tlDriver.set(new FirefoxDriver(options));
-
-        } else if (browserName.equalsIgnoreCase("edge")) {
-            synchronized (DriverFactory.class) {
-                WebDriverManager.edgedriver().setup();
-            }
-            EdgeOptions options = new EdgeOptions();
-            if (headless) options.addArguments("--headless=new");
-            tlDriver.set(new EdgeDriver(options));
-
+        if (bsUsername != null && bsAccessKey != null && !bsUsername.isEmpty() && !bsAccessKey.isEmpty()) {
+            System.out.println("BrowserStack credentials found. Routing to BrowserStack cloud...");
+            tlDriver.set(createBrowserStackDriver(browserName, bsUsername, bsAccessKey));
         } else {
-            throw new IllegalArgumentException(
-                "Unsupported browser: '" + browserName + "'. Use chrome, firefox, or edge.");
+            System.out.println("BrowserStack credentials not found. Using local WebDriver...");
+            tlDriver.set(createLocalDriver(browserName, headless));
         }
 
         WebDriver driver = getDriver();
         String baseUrl = prop.getProperty("url");
-        tlBaseUrl.set(baseUrl);          // store so page objects can use getBaseUrl()
+        tlBaseUrl.set(baseUrl);
 
         driver.manage().deleteAllCookies();
         driver.manage().window().maximize();
@@ -87,6 +65,80 @@ public class DriverFactory {
         driver.get(baseUrl);
 
         return driver;
+    }
+
+    /**
+     * Creates a BrowserStack RemoteWebDriver instance
+     */
+    private WebDriver createBrowserStackDriver(String browserName, String username, String accessKey) {
+        try {
+            Map<String, Object> browserstackOptions = new HashMap<>();
+            browserstackOptions.put("userName", username);
+            browserstackOptions.put("accessKey", accessKey);
+            browserstackOptions.put("buildName", "Retail-Automation-Build");
+            browserstackOptions.put("sessionName", "BDD Test - " + browserName);
+            browserstackOptions.put("debug", true);
+            browserstackOptions.put("networkLogs", true);
+            browserstackOptions.put("consoleLogs", "info");
+
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--disable-blink-features=AutomationControlled");
+            options.addArguments("--disable-extensions");
+
+            if (browserName.equalsIgnoreCase("chrome")) {
+                options.setCapability("os", "Windows");
+                options.setCapability("osVersion", "10");
+                options.setCapability("browserVersion", "120.0");
+            } else if (browserName.equalsIgnoreCase("firefox")) {
+                options = new ChromeOptions(); // Use Chrome options structure for BrowserStack
+                options.setCapability("browserName", "Firefox");
+                options.setCapability("os", "Windows");
+                options.setCapability("osVersion", "10");
+                options.setCapability("browserVersion", "120.0");
+            }
+
+            options.setCapability("bstack:options", browserstackOptions);
+
+            String hubURL = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
+            return new RemoteWebDriver(new URL(hubURL), options);
+
+        } catch (Exception e) {
+            System.err.println("Failed to create BrowserStack driver: " + e.getMessage());
+            System.out.println("Falling back to local WebDriver...");
+            return createLocalDriver(browserName, false);
+        }
+    }
+
+    /**
+     * Creates a local WebDriver instance
+     */
+    private WebDriver createLocalDriver(String browserName, boolean headless) {
+        if (browserName.equalsIgnoreCase("chrome")) {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--disable-blink-features=AutomationControlled");
+            options.addArguments("--disable-extensions");
+            if (headless) {
+                options.addArguments("--headless=new");
+                options.addArguments("--no-sandbox");
+                options.addArguments("--disable-dev-shm-usage");
+                options.addArguments("--window-size=1920,1080");
+            }
+            return new ChromeDriver(options);
+
+        } else if (browserName.equalsIgnoreCase("firefox")) {
+            FirefoxOptions options = new FirefoxOptions();
+            if (headless) options.addArguments("--headless");
+            return new FirefoxDriver(options);
+
+        } else if (browserName.equalsIgnoreCase("edge")) {
+            EdgeOptions options = new EdgeOptions();
+            if (headless) options.addArguments("--headless=new");
+            return new EdgeDriver(options);
+
+        } else {
+            throw new IllegalArgumentException(
+                "Unsupported browser: '" + browserName + "'. Use chrome, firefox, or edge.");
+        }
     }
 
     /**
