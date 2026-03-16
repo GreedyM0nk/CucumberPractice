@@ -29,6 +29,9 @@ jobs:
       - name: Run Tests
         run: mvn clean test
         continue-on-error: true # Keep going even if tests fail
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
 
       # 1. Fetch the previous run's history to build the trend charts
       - name: Get Allure history
