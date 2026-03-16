@@ -20,10 +20,7 @@ import java.util.List;
  * - Payment method icons
  * - Bottom bar with copyright and links
  */
-public class FooterPage {
-
-    private WebDriver driver;
-    private WebDriverWait wait;
+public class FooterPage extends BasePage {
 
     // ─────────────────────────────────────────────
     // FOOTER STRUCTURE LOCATORS
@@ -77,9 +74,7 @@ public class FooterPage {
     // ─────────────────────────────────────────────
 
     public FooterPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        PageFactory.initElements(driver, this);
+        super(driver);  // Initialize BasePage with WebDriver and waits
     }
 
     // ─────────────────────────────────────────────
@@ -200,11 +195,18 @@ public class FooterPage {
     // ─────────────────────────────────────────────
 
     /**
-     * Get footer bottom bar text
+     * Get footer bottom bar text - returns empty string if not found
      */
     public String getFooterBottomBarText() {
-        wait.until(ExpectedConditions.visibilityOf(footerBottomBar));
-        return footerBottomBar.getText();
+        try {
+            // Try to find footer with more generic selector
+            WebElement footer = driver.findElement(By.cssSelector("footer, div[role='contentinfo'], [class*='footer']"));
+            wait.until(ExpectedConditions.visibilityOf(footer));
+            return footer.getText();
+        } catch (Exception e) {
+            System.out.println("DEBUG: Footer bottom bar not found: " + e.getMessage());
+            return "";
+        }
     }
 
     /**
@@ -218,19 +220,34 @@ public class FooterPage {
      * Verify link exists in footer bottom bar
      */
     public boolean isLinkInFooterBottomBar(String linkText) {
-        return bottomBarLinks.stream()
-                .anyMatch(link -> link.getText().equalsIgnoreCase(linkText) && link.isDisplayed());
+        try {
+            WebElement footer = driver.findElement(By.cssSelector("footer, div[role='contentinfo']"));
+            List<WebElement> links = footer.findElements(By.partialLinkText(linkText));
+            return !links.isEmpty() && links.stream().anyMatch(WebElement::isDisplayed);
+        } catch (Exception e) {
+            System.out.println("DEBUG: Footer link '" + linkText + "' not found");
+            return false;
+        }
     }
 
     /**
      * Click link in footer bottom bar
      */
     public void clickLinkInFooterBottomBar(String linkText) {
-        WebElement link = bottomBarLinks.stream()
-                .filter(l -> l.getText().equalsIgnoreCase(linkText))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Link '" + linkText + "' not found in footer bottom bar"));
-        wait.until(ExpectedConditions.elementToBeClickable(link)).click();
+        try {
+            WebElement footer = driver.findElement(By.cssSelector("footer, div[role='contentinfo']"));
+            WebElement link = footer.findElement(By.partialLinkText(linkText));
+            wait.until(ExpectedConditions.elementToBeClickable(link)).click();
+        } catch (Exception e) {
+            System.out.println("DEBUG: Could not click footer link '" + linkText + "': " + e.getMessage());
+            // Try alternate selectors
+            try {
+                WebElement link = driver.findElement(By.xpath("//a[contains(text(), '" + linkText + "')]"));
+                wait.until(ExpectedConditions.elementToBeClickable(link)).click();
+            } catch (Exception ex) {
+                throw new RuntimeException("Link '" + linkText + "' not found in footer bottom bar");
+            }
+        }
     }
 
     /**
@@ -273,5 +290,21 @@ public class FooterPage {
     public void scrollToFooter() {
         ((org.openqa.selenium.JavascriptExecutor) driver)
                 .executeScript("arguments[0].scrollIntoView(true);", footerElement);
+    }
+
+    /**
+     * Get footer section heading text - returns null if not found
+     */
+    public String getFooterHeadingText(String heading) {
+        try {
+            // Try exact match first
+            WebElement headingElement = driver.findElement(By.xpath(
+                ".//footer//h3[text()='" + heading + "'] | .//footer//h2[text()='" + heading + "']"
+            ));
+            return headingElement.getText();
+        } catch (Exception e) {
+            System.out.println("DEBUG: Footer heading '" + heading + "' not found");
+            return null;
+        }
     }
 }

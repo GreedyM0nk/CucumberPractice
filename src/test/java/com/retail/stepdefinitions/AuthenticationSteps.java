@@ -40,28 +40,24 @@ public class AuthenticationSteps {
     public void user_clicks_on_login_link() {
         getLoginPage().clickLoginLink();
         System.out.println("✓ User clicked on login link");
-        try { Thread.sleep(1000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     @When("user clicks on sign up link")
     public void user_clicks_on_sign_up_link() {
         getLoginPage().clickSignupLink();
         System.out.println("✓ User clicked on signup link");
-        try { Thread.sleep(1000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     @When("user clicks on login option")
     public void user_clicks_on_login_option() {
         getLoginPage().clickLoginLink();
         System.out.println("✓ User clicked on login link");
-        try { Thread.sleep(1000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     @When("user clicks on create account option")
     public void user_clicks_on_create_account_option() {
         getLoginPage().clickSignupLink();
         System.out.println("✓ User clicked on signup link");
-        try { Thread.sleep(1000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     @When("user enters email for login")
@@ -82,7 +78,6 @@ public class AuthenticationSteps {
     public void user_clicks_the_login_button() {
         getLoginPage().clickLoginButton();
         System.out.println("✓ User clicked the login button");
-        try { Thread.sleep(2000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     @When("user enters email for signup")
@@ -124,12 +119,10 @@ public class AuthenticationSteps {
     public void user_clicks_the_create_account_button() {
         getLoginPage().clickCreateAccountButton();
         System.out.println("✓ User clicked the create account button");
-        try { Thread.sleep(2000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     @Then("user should be logged in")
     public void user_should_be_logged_in() {
-        try { Thread.sleep(1000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         boolean isLoggedIn = getLoginPage().isUserLoggedIn();
         Assert.assertTrue("User should be logged in after signup", isLoggedIn);
         System.out.println("✓ User is successfully logged in");
@@ -137,7 +130,6 @@ public class AuthenticationSteps {
 
     @Then("user should be logged in successfully")
     public void user_should_be_logged_in_successfully() {
-        try { Thread.sleep(1000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         boolean isLoggedIn = getLoginPage().isUserLoggedIn();
         Assert.assertTrue("User should be logged in after login", isLoggedIn);
         System.out.println("✓ User is successfully logged in");
