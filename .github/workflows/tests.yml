@@ -42,7 +42,7 @@ jobs:
           sudo apt-get install -y google-chrome-stable
           google-chrome --version
 
-      # FIX 1: Install Allure CLI directly — do NOT rely on mvn allure:report
+      # Install Allure CLI for report generation
       - name: Install Allure CLI
         run: |
           curl -o allure-2.27.0.tgz -OLs https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
@@ -50,13 +50,10 @@ jobs:
           sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
           allure --version
 
-      # FIX 2: Use all runners (not SmokeTestRunner which doesn't exist)
+      # Run all test suites
       - name: Run All Tests
         run: mvn clean test -Denv=uat
         continue-on-error: true
-        env:
-          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
-          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
 
       - name: Check Allure Results
         if: always()
