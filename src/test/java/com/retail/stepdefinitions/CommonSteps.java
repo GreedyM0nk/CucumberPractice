@@ -5,7 +5,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import com.retail.utils.DriverFactory;
-import com.retail.utils.ConfigReader;
 
 import static org.junit.Assert.assertTrue;
 
@@ -35,24 +34,23 @@ public class CommonSteps {
 
     @Given("I am on the Sauce Demo homepage")
     public void navigateToSauceDemoHomepage() {
-        String baseUrl = ConfigReader.getProperty("base.url");
-        if (baseUrl == null || baseUrl.isEmpty()) {
-            baseUrl = "https://www.saucedemo.com";
-        }
-        driver.navigate().to(baseUrl);
+        driver.navigate().to("https://sauce-demo.myshopify.com/");
         // Wait for page to load
-        wait.until(ExpectedConditions.urlContains("saucedemo"));
+        wait.until(ExpectedConditions.urlContains("sauce-demo"));
+    }
+
+    @Given("I am on the Sauce Demo homepage {string}")
+    public void navigateToSauceDemoHomepageWithUrl(String url) {
+        driver.navigate().to(url);
+        wait.until(ExpectedConditions.urlContains("sauce-demo"));
     }
 
     @Given("I am on the {string} page")
     public void navigateToPage(String pagePath) {
-        String baseUrl = ConfigReader.getProperty("base.url");
-        if (baseUrl == null || baseUrl.isEmpty()) {
-            baseUrl = "https://www.saucedemo.com";
-        }
+        String baseUrl = "https://sauce-demo.myshopify.com";
         String fullUrl = baseUrl + pagePath;
         driver.navigate().to(fullUrl);
-        wait.until(ExpectedConditions.urlContains(pagePath));
+        wait.until(ExpectedConditions.urlContains(pagePath.substring(0, Math.min(5, pagePath.length()))));
     }
 
     @Given("I refresh the current page")

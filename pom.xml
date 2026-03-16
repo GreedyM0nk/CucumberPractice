@@ -275,7 +275,7 @@
                 <configuration>
                     <!--
                         Run each *Runner class in its own forked JVM.
-                        forkCount=5 / reuseForks=false → true process isolation,
+                        forkCount=6 / reuseForks=false → true process isolation,
                         no ThreadLocal or static state can bleed between forks.
                         
                         Runners:
@@ -284,11 +284,12 @@
                         - ParallelRunner3: @S3 - Checkout Flow
                         - ParallelRunner4: @S4 - Authentication/Login
                         - ParallelRunner5: @S5 - Footer Navigation & Content
+                        - ParallelRunner6: @S6 - Header Navigation
                     -->
-                    <forkCount>5</forkCount>
+                    <forkCount>6</forkCount>
                     <reuseForks>false</reuseForks>
                     <parallel>classes</parallel>
-                    <threadCount>5</threadCount>
+                    <threadCount>6</threadCount>
 
                     <systemPropertyVariables>
                         <!-- Forward the active profile's env value into every forked JVM -->
