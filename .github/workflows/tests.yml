@@ -7,7 +7,6 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-# Permissions required for GitHub Pages deployment
 permissions:
   contents: write
   pages: write
@@ -30,77 +29,67 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # Run all tests - this generates both JUnit XML and Allure JSON results
+      # FIX 1: Install Allure CLI directly — do NOT rely on mvn allure:report
+      - name: Install Allure CLI
+        run: |
+          curl -o allure-2.27.0.tgz -OLs https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+          sudo tar -zxvf allure-2.27.0.tgz -C /opt/
+          sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
+          allure --version
+
+      # FIX 2: Use all runners (not SmokeTestRunner which doesn't exist)
       - name: Run All Tests
-        run: mvn clean test -Denv=uat -Dtest=SmokeTestRunner
+        run: mvn clean test -Denv=uat
         continue-on-error: true
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
 
-      # Verify test execution results
-      - name: Check Test Results
+      - name: Check Allure Results
         if: always()
         run: |
-          echo "=== Test Results Check ==="
-          echo ""
-          echo "Checking for test result files..."
-          
+          echo "=== Allure Results Check ==="
           RESULT_COUNT=$(find target/allure-results -name "*.json" 2>/dev/null | wc -l)
-          echo "✓ Found $RESULT_COUNT Allure result files"
-          
-          if [ -d target/surefire-reports ]; then
-            SUREFIRE_COUNT=$(find target/surefire-reports -name "*.xml" 2>/dev/null | wc -l)
-            echo "✓ Found $SUREFIRE_COUNT Surefire XML reports"
-          fi
-          
-          echo ""
-          ls -la target/allure-results | head -20 || echo "No allure-results directory"
-          echo ""
+          echo "Found $RESULT_COUNT Allure result files"
+          ls -la target/allure-results/ 2>/dev/null | head -30 || echo "No allure-results directory found"
 
-      # Download historical Allure reports for trend analysis
-      - name: Download Previous Report History
-        uses: actions/checkout@v4
+      # FIX 3: Restore previous history BEFORE generating the report (enables Trend chart)
+      - name: Restore Allure History
         if: always()
+        uses: actions/checkout@v4
         continue-on-error: true
         with:
           ref: gh-pages
-          path: allure-report-history
-          sparse-checkout: 'history'
+          path: gh-pages-history
 
-      # Generate Allure HTML report from JSON results
+      - name: Copy History Into Results
+        if: always()
+        run: |
+          mkdir -p target/allure-results/history
+          if [ -d "gh-pages-history/history" ]; then
+            echo "Restoring previous history for trend charts..."
+            cp -r gh-pages-history/history/* target/allure-results/history/ 2>/dev/null || true
+            echo "History restored:"
+            ls -la target/allure-results/history/
+          else
+            echo "No previous history found — this is likely the first run."
+          fi
+
+      # FIX 4: Generate report using Allure CLI (reliable, not Maven plugin)
       - name: Generate Allure Report
         if: always()
         run: |
-          set +e
-          echo "Generating Allure report..."
-          
-          # Run Allure report generation
-          mvn allure:report \
-              -Dallure.results.directory=target/allure-results \
-              -q
-          
-          if [ -f "target/site/allure-report/index.html" ]; then
-              echo "✓ Allure report generated successfully"
-          else
-              echo "⚠ Creating minimal report structure..."
-              mkdir -p target/site/allure-report
-          fi
+          allure generate target/allure-results --clean -o target/site/allure-report
+          echo "Report generated:"
+          ls -la target/site/allure-report/
 
-      # Integrate historical data for trend charts
-      - name: Integrate Report History
+      - name: Save New History to gh-pages
         if: always()
         run: |
           mkdir -p target/site/allure-report/history
-          
-          # Copy previous history if it exists
-          if [ -d "allure-report-history/history" ]; then
-              echo "Integrating historical data..."
-              cp -r allure-report-history/history/* target/site/allure-report/history/ 2>/dev/null || true
-              ls -la target/site/allure-report/history/
-          fi
+          echo "History to be deployed:"
+          ls -la target/site/allure-report/history/ 2>/dev/null || echo "No history directory yet"
 
-      # Publish the report to GitHub Pages
       - name: Deploy Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         if: always()
@@ -109,30 +98,17 @@ jobs:
           publish_branch: gh-pages
           publish_dir: target/site/allure-report
           force_orphan: false
-          retention_days: 30
+          keep_files: false
 
-      # Post-deployment verification and summary
-      - name: Report Generation Summary
+      - name: Report Summary
         if: always()
         run: |
-          echo ""
           echo "=========================================="
-          echo "Test Execution & Report Generation Summary"
+          echo "  Test Execution & Report Summary"
           echo "=========================================="
-          echo ""
-          
-          if [ -f "target/site/allure-report/index.html" ]; then
-              echo "✓ Allure Report: GENERATED ✓"
-              echo ""
-              REPO_OWNER=$(echo '${{ github.repository }}' | cut -d/ -f1)
-              REPO_NAME=$(echo '${{ github.repository }}' | cut -d/ -f2)
-              echo "📊 View Report: https://${REPO_OWNER}.github.io/${REPO_NAME}/"
-              echo ""
-          else
-              echo "⚠ Allure Report: NOT GENERATED"
-              echo "  Check logs above for details"
-          fi
-          
+          REPO_OWNER=$(echo '${{ github.repository }}' | cut -d/ -f1)
+          REPO_NAME=$(echo '${{ github.repository }}' | cut -d/ -f2)
+          echo "📊 Report URL: https://${REPO_OWNER}.github.io/${REPO_NAME}/"
           echo "Branch: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
           echo "Timestamp: $(date)"
