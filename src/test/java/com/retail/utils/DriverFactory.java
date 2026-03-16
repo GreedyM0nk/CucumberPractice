@@ -7,13 +7,9 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.net.URL;
 import java.time.Duration;
 import java.util.Properties;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DriverFactory {
 
@@ -32,8 +28,8 @@ public class DriverFactory {
     /**
      * Creates a new WebDriver for the current thread and stores it in ThreadLocal.
      *
-     * Checks for BrowserStack environment variables and routes to cloud if present.
-     * Falls back to local WebDriver instantiation if not.
+     * Runs local WebDriver (Chrome, Firefox, or Edge).
+     * Auto-detects CI environment and enables headless mode accordingly.
      */
     public WebDriver init_driver(Properties prop) {
         String browserName = prop.getProperty("browser").trim();
@@ -49,28 +45,7 @@ public class DriverFactory {
         System.out.println("CI Environment: " + isCIEnvironment);
         System.out.println("Headless mode: " + headless);
 
-        // Check if BrowserStack credentials are available (Priority order):
-        // 1. Environment variables (CI/CD preference)
-        // 2. browserstack.yml file (local development)
-        String bsUsername = System.getenv("BROWSERSTACK_USERNAME");
-        String bsAccessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
-
-        // If env vars are not set, try reading from browserstack.yml
-        if ((bsUsername == null || bsUsername.isEmpty()) || (bsAccessKey == null || bsAccessKey.isEmpty())) {
-            java.util.Map<String, String> bsConfig = BrowserStackConfigReader.getBrowserStackCredentials();
-            if (!bsConfig.isEmpty()) {
-                bsUsername = bsConfig.getOrDefault("userName", bsUsername);
-                bsAccessKey = bsConfig.getOrDefault("accessKey", bsAccessKey);
-            }
-        }
-
-        if (bsUsername != null && bsAccessKey != null && !bsUsername.isEmpty() && !bsAccessKey.isEmpty()) {
-            System.out.println("✓ BrowserStack credentials found. Routing to BrowserStack cloud...");
-            tlDriver.set(createBrowserStackDriver(browserName, bsUsername, bsAccessKey));
-        } else {
-            System.out.println("✗ BrowserStack credentials not found. Using local WebDriver...");
-            tlDriver.set(createLocalDriver(browserName, headless));
-        }
+        tlDriver.set(createLocalDriver(browserName, headless));
 
         WebDriver driver = getDriver();
         String baseUrl = prop.getProperty("url");
@@ -83,56 +58,6 @@ public class DriverFactory {
         driver.get(baseUrl);
 
         return driver;
-    }
-
-    /**
-     * Creates a BrowserStack RemoteWebDriver instance
-     */
-    private WebDriver createBrowserStackDriver(String browserName, String username, String accessKey) {
-        try {
-            Map<String, Object> browserstackOptions = new HashMap<>();
-            browserstackOptions.put("userName", username);
-            browserstackOptions.put("accessKey", accessKey);
-            browserstackOptions.put("buildName", "Retail-Automation-Build");
-            browserstackOptions.put("sessionName", "BDD Test - " + browserName);
-            browserstackOptions.put("debug", true);
-            browserstackOptions.put("networkLogs", true);
-            browserstackOptions.put("consoleLogs", "info");
-
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--disable-blink-features=AutomationControlled");
-            options.addArguments("--disable-extensions");
-            // Required for stability when BrowserStack falls back to local execution in CI
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-
-            if (browserName.equalsIgnoreCase("chrome")) {
-                options.setCapability("os", "Windows");
-                options.setCapability("osVersion", "10");
-                options.setCapability("browserVersion", "120.0");
-            } else if (browserName.equalsIgnoreCase("firefox")) {
-                options = new ChromeOptions(); // Use Chrome options structure for BrowserStack
-                options.setCapability("browserName", "Firefox");
-                options.setCapability("os", "Windows");
-                options.setCapability("osVersion", "10");
-                options.setCapability("browserVersion", "120.0");
-            }
-
-            options.setCapability("bstack:options", browserstackOptions);
-
-            String hubURL = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
-            System.out.println("Connecting to BrowserStack hub: " + hubURL.replaceAll(":([\ ^@]+)@", ":****@"));
-            System.out.println("BrowserStack options: " + options.toString());
-            return new RemoteWebDriver(new URL(hubURL), options);
-
-        } catch (Exception e) {
-            System.err.println("Failed to create BrowserStack driver: " + e.getMessage());
-            System.out.println("Falling back to local WebDriver...");
-            // Determine headless for fallback based on CI environment
-            boolean isCIFallback = Boolean.parseBoolean(System.getenv("CI")) ||
-                                   Boolean.parseBoolean(System.getenv("HEADLESS"));
-            return createLocalDriver(browserName, isCIFallback);
-        }
     }
 
     /**
