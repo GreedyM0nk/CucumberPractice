@@ -26,50 +26,70 @@ public class HeaderPage extends BasePage {
     // ─────────────────────────────────────────────
     // TOP NAVIGATION BAR LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred (if available): [data-testid='top-navigation']
+    // Alternative selectors ordered by specificity:
+    // 1. nav.header-nav (class-based)
+    // 2. header nav (structural)
+    // 3. nav (generic)
 
-    @FindBy(css = "nav, header nav, .header-nav")
+    @FindBy(css = "[data-testid='top-navigation'], nav.header-nav, header nav, nav")
     private WebElement topNavigation;
 
-    @FindBy(css = "header a, nav a")
+    @FindBy(css = "[data-testid='top-nav-links'], header a, nav a, [data-testid='nav-link']")
     private List<WebElement> topNavLinks;
 
     // ─────────────────────────────────────────────
     // SITE LOGO AND TAGLINE LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred (if available): [data-testid='site-logo']
+    // Logo selectors ordered by specificity:
+    // 1. img[data-testid='logo'] or img[data-testid='site-logo']
+    // 2. .site-logo img or header .logo img (class-based)
+    // 3. img[alt*='Sauce'] or img[alt*='logo'] (attribute-based)
 
-    @FindBy(css = "header .logo img, .site-logo img, header img[alt*='logo'], header img[alt*='Sauce']")
+    @FindBy(css = "[data-testid='site-logo'], header .logo img, .site-logo img, header img[alt*='Sauce'], header img[alt*='logo']")
     private WebElement siteLogo;
 
-    @FindBy(css = ".tagline, .site-tagline, header .tagline, h1 + p")
+    @FindBy(css = "[data-testid='site-tagline'], .site-tagline, .tagline, header .tagline, h1 + p")
     private WebElement tagline;
 
     // ─────────────────────────────────────────────
     // SIDE NAVIGATION LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred (if available): [data-testid='side-navigation']
+    // Side nav selectors ordered by specificity:
+    // 1. aside nav (semantic HTML)
+    // 2. .sidebar or .side-nav (class-based)
+    // 3. .left-menu (fallback class)
 
-    @FindBy(css = ".sidebar, .side-nav, .left-menu, aside nav")
+    @FindBy(css = "[data-testid='side-navigation'], aside nav, .sidebar, .side-nav, .left-menu")
     private WebElement sideNavigation;
 
-    @FindBy(css = ".sidebar a, .side-nav a, .left-menu a, aside nav a")
+    @FindBy(css = "[data-testid='side-nav-links'], aside nav a, .sidebar a, .side-nav a, .left-menu a")
     private List<WebElement> sideNavLinks;
 
     // ─────────────────────────────────────────────
     // SOCIAL ICONS LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred (if available): [data-testid='social-facebook'], etc.
+    // Social icon selectors ordered by specificity:
+    // 1. [data-testid='social-X'] (most stable)
+    // 2. .social-icon.X class (semantic)
+    // 3. a[href*='X.com'] or a .fa-X (attribute/icon-based)
 
-    @FindBy(css = "a[href*='facebook.com'], .social-icon.facebook, a .fa-facebook")
+    @FindBy(css = "[data-testid='social-facebook'], a[href*='facebook.com'], .social-icon.facebook, a .fa-facebook")
     private WebElement facebookIcon;
 
-    @FindBy(css = "a[href*='twitter.com'], .social-icon.twitter, a .fa-twitter")
+    @FindBy(css = "[data-testid='social-twitter'], a[href*='twitter.com'], .social-icon.twitter, a .fa-twitter")
     private WebElement twitterIcon;
 
-    @FindBy(css = "a[href*='instagram.com'], .social-icon.instagram, a .fa-instagram")
+    @FindBy(css = "[data-testid='social-instagram'], a[href*='instagram.com'], .social-icon.instagram, a .fa-instagram")
     private WebElement instagramIcon;
 
-    @FindBy(css = "a[href*='pinterest.com'], .social-icon.pinterest, a .fa-pinterest")
+    @FindBy(css = "[data-testid='social-pinterest'], a[href*='pinterest.com'], .social-icon.pinterest, a .fa-pinterest")
     private WebElement pinterestIcon;
 
-    @FindBy(css = "a[href*='feed'], a[href*='rss'], .social-icon.rss, a .fa-rss, [role='link'][aria-label*='RSS'], a[title*='RSS']")
+    @FindBy(css = "[data-testid='social-rss'], a[href*='feed'], a[href*='rss'], .social-icon.rss, a .fa-rss, [role='link'][aria-label*='RSS'], a[title*='RSS']")
     private WebElement rssIcon;
 
     // ─────────────────────────────────────────────

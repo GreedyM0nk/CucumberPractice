@@ -12,24 +12,36 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  */
 public class LoginPage extends BasePage {
 
-    // Page Locators for Account Navigation - Direct links found on homepage
-    @FindBy(css = "a[href='/account/login']")
+    // ─────────────────────────────────────────────
+    // ACCOUNT NAVIGATION LOCATORS
+    // ─────────────────────────────────────────────
+    // Preferred: [data-testid='account-login-link'], [data-testid='account-signup-link']
+
+    @FindBy(css = "[data-testid='account-login-link'], a[href='/account/login']")
     private WebElement loginLink;
 
-    @FindBy(css = "a[href='/account/register']")
+    @FindBy(css = "[data-testid='account-signup-link'], a[href='/account/register']")
     private WebElement signupLink;
 
-    // Login Form Locators - /account/login page
+    // ─────────────────────────────────────────────
+    // LOGIN FORM LOCATORS
+    // ─────────────────────────────────────────────
+    // Preferred: [data-testid='login-email'], [data-testid='login-password'], [data-testid='login-button']
+
     @FindBy(name = "customer[email]")
     private WebElement loginEmailInput;
 
     @FindBy(name = "customer[password]")
     private WebElement loginPasswordInput;
 
-    @FindBy(css = "input[type='submit'][value='Sign In']")
+    @FindBy(css = "[data-testid='login-button'], input[type='submit'][value='Sign In']")
     private WebElement loginButton;
 
-    // Signup Form Locators - /account/register page
+    // ─────────────────────────────────────────────
+    // SIGNUP FORM LOCATORS
+    // ─────────────────────────────────────────────
+    // Preferred: [data-testid='signup-firstname'], [data-testid='signup-lastname'], [data-testid='signup-email'], etc.
+
     @FindBy(name = "customer[first_name]")
     private WebElement signupFirstNameInput;
 
@@ -42,14 +54,18 @@ public class LoginPage extends BasePage {
     @FindBy(name = "customer[password]")
     private WebElement signupPasswordInput;
 
-    @FindBy(css = "input[type='submit'][value='Create']")
+    @FindBy(css = "[data-testid='create-account-button'], input[type='submit'][value='Create']")
     private WebElement createAccountButton;
 
-    // Account/Logged In Indicators
-    @FindBy(css = "a[href='/account/logout'], a[href*='account/logout']")
+    // ─────────────────────────────────────────────
+    // ACCOUNT/LOGGED IN INDICATORS
+    // ─────────────────────────────────────────────
+    // Preferred: [data-testid='account-logout-link'], [data-testid='account-page']
+
+    @FindBy(css = "[data-testid='account-logout-link'], a[href='/account/logout'], a[href*='account/logout']")
     private WebElement logoutLink;
 
-    @FindBy(css = ".account-page, .account-welcome, h1.account-title")
+    @FindBy(css = "[data-testid='account-page'], .account-page, .account-welcome, h1.account-title")
     private WebElement accountPageElement;
 
     // Constructor

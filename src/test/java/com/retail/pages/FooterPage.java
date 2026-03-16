@@ -25,48 +25,53 @@ public class FooterPage extends BasePage {
     // ─────────────────────────────────────────────
     // FOOTER STRUCTURE LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred (if available): [data-testid='footer-section'], [data-testid='footer-nav'], etc.
 
     @FindBy(tagName = "footer")
     private WebElement footerElement;
 
-    @FindBy(css = "footer nav, footer .footer-navigation")
+    @FindBy(css = "[data-testid='footer-nav'], footer nav, footer .footer-navigation")
     private WebElement footerNavigation;
 
-    @FindBy(css = "footer .footer-bottom, footer .footer-bar")
+    @FindBy(css = "[data-testid='footer-bottom'], footer .footer-bottom, footer .footer-bar")
     private WebElement footerBottomBar;
 
-    @FindBy(css = "footer .footer-section, footer .footer-about")
+    @FindBy(css = "[data-testid='footer-sections'], footer .footer-section, footer .footer-about")
     private List<WebElement> footerSections;
 
     // ─────────────────────────────────────────────
     // FOOTER NAVIGATION LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='footer-nav-heading'], [data-testid='footer-nav-links']
 
-    @FindBy(css = "footer nav h3")
+    @FindBy(css = "[data-testid='footer-nav-heading'], footer nav h3, footer nav h2")
     private WebElement footerNavHeading;
 
-    @FindBy(css = "footer nav a")
+    @FindBy(css = "[data-testid='footer-nav-links'], footer nav a")
     private List<WebElement> footerNavLinks;
 
     // ─────────────────────────────────────────────
     // ABOUT US SECTION LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='footer-section-heading']
 
-    @FindBy(css = "footer .footer-section h3, footer .footer-about h3")
+    @FindBy(css = "[data-testid='footer-section-heading'], footer .footer-section h3, footer .footer-about h3, footer h2")
     private List<WebElement> footerSectionHeadings;
 
     // ─────────────────────────────────────────────
     // PAYMENT ICONS LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='payment-icon']
 
-    @FindBy(css = "footer .footer-payments img, footer .payment-icons img")
+    @FindBy(css = "[data-testid='payment-icon'], footer .footer-payments img, footer .payment-icons img, footer .payments img")
     private List<WebElement> paymentIcons;
 
     // ─────────────────────────────────────────────
     // BOTTOM BAR LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='footer-bottom-link']
 
-    @FindBy(css = "footer .footer-bottom a, footer .footer-bar a")
+    @FindBy(css = "[data-testid='footer-bottom-link'], footer .footer-bottom a, footer .footer-bar a")
     private List<WebElement> bottomBarLinks;
 
     // ─────────────────────────────────────────────
