@@ -102,6 +102,9 @@ public class DriverFactory {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--disable-blink-features=AutomationControlled");
             options.addArguments("--disable-extensions");
+            // Required for stability when BrowserStack falls back to local execution in CI
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
 
             if (browserName.equalsIgnoreCase("chrome")) {
                 options.setCapability("os", "Windows");
@@ -118,12 +121,17 @@ public class DriverFactory {
             options.setCapability("bstack:options", browserstackOptions);
 
             String hubURL = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
+            System.out.println("Connecting to BrowserStack hub: " + hubURL.replaceAll(":([\ ^@]+)@", ":****@"));
+            System.out.println("BrowserStack options: " + options.toString());
             return new RemoteWebDriver(new URL(hubURL), options);
 
         } catch (Exception e) {
             System.err.println("Failed to create BrowserStack driver: " + e.getMessage());
             System.out.println("Falling back to local WebDriver...");
-            return createLocalDriver(browserName, false);
+            // Determine headless for fallback based on CI environment
+            boolean isCIFallback = Boolean.parseBoolean(System.getenv("CI")) ||
+                                   Boolean.parseBoolean(System.getenv("HEADLESS"));
+            return createLocalDriver(browserName, isCIFallback);
         }
     }
 
