@@ -6,22 +6,22 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
-        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default environment — overridden by the active Maven profile or -Denv=xxx -->
         <env>uat</env>
-        <!-- Java 25 Feature Support -->
-        <java.version>25</java.version>
+        <!-- Java 21 LTS Feature Support (Java 25 features still usable via preview flags) -->
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>
-        <!-- Selenium 4.x with Java 25 support -->
+        <!-- Selenium 4.x with Java 25 support (stable version) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.28.1</version>
+            <version>4.15.0</version>
         </dependency>
 
         <dependency>
@@ -64,11 +64,11 @@
             <version>2.2</version>
         </dependency>
 
-        <!-- WebDriver Manager with Java 25 support -->
+        <!-- WebDriver Manager with Java 25 support (stable version) -->
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>6.7.2</version>
+            <version>6.1.0</version>
         </dependency>
 
         <dependency>
@@ -77,33 +77,13 @@
             <version>2.10.1</version>
         </dependency>
 
-        <!-- Allure Reports with Java 25 support -->
+        <!-- Allure Reports (stable version with Java 25 compatibility) -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber7-jvm</artifactId>
-            <version>2.28.0</version>
+            <version>2.24.0</version>
         </dependency>
 
-        <!-- ExtentReports with Java 25 support -->
-        <dependency>
-            <groupId>tech.grasshopper</groupId>
-            <artifactId>extentreports-cucumber7-adapter</artifactId>
-            <version>1.15.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-io</groupId>
-                    <artifactId>commons-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.poi</groupId>
-                    <artifactId>poi-ooxml</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <!-- Secure dependency versions to override vulnerable transitive dependencies -->
         <dependency>
@@ -135,47 +115,47 @@
              The transitive version pulled by other deps is 2.10.3, which lacks
              that class and causes a NoClassDefFoundError at startup.
              Updated to 2.16.1 to patch async parser DoS vulnerability (CVE-2024-50379). -->
-        <!-- Jackson updated for Java 25 and security patches -->
+        <!-- Jackson updated for security patches (stable version) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.17.1</version>
+            <version>2.16.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.17.1</version>
+            <version>2.16.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.17.1</version>
+            <version>2.16.1</version>
         </dependency>
 
-        <!-- Log4j 2.x with Java 25 support and latest security patches -->
+        <!-- Log4j 2.x with security patches (stable version with Java 25 support) -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.24.2</version>
+            <version>2.24.1</version>
         </dependency>
         
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.24.2</version>
+            <version>2.24.1</version>
         </dependency>
 
-        <!-- SLF4J bridge for Log4j 2.x with Java 25 support -->
+        <!-- SLF4J bridge for Log4j 2.x (stable version with Java 25 support) -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j2-impl</artifactId>
-            <version>2.24.2</version>
+            <version>2.24.1</version>
         </dependency>
         
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.17</version>
+            <version>2.0.16</version>
         </dependency>
 
         <dependency>
@@ -276,6 +256,21 @@
                 </executions>
             </plugin>
 
+            <!-- Maven Compiler Plugin with Java 21 preview features enabled for Java 25 compatibility -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <release>21</release>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -323,8 +318,8 @@
                         <exclude>**/APITestRunner.java</exclude>
                     </excludes>
 
-                    <!-- JVM memory settings -->
-                    <argLine>-Xmx512m</argLine>
+                    <!-- Enable preview features for Java 21 (Java 25 feature compatibility) -->
+                    <argLine>--enable-preview -Xmx512m</argLine>
                 </configuration>
             </plugin>
 
@@ -351,6 +346,8 @@
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
                     <testFailureIgnore>true</testFailureIgnore>
+                    <!-- Enable preview features for Java 21 (Java 25 feature compatibility) -->
+                    <argLine>--enable-preview</argLine>
                 </configuration>
                 <executions>
                     <execution>

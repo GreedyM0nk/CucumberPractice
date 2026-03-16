@@ -1,49 +1,32 @@
 package com.retail.utils;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 /**
- * Virtual Thread-based Wait Utilities (Java 25 - Project Loom)
+ * Virtual Thread Wait Utilities for Java 21+ 
  * 
- * Leverages Java 25 Virtual Threads for efficient, lightweight asynchronous waits.
- * Virtual Threads allow thousands of concurrent waits without consuming native threads,
- * enabling superior scalability for parallel test execution.
+ * Demonstrates non-blocking waits using virtual threads for improved
+ * scalability in test automation, especially for parallel test execution.
  * 
- * Features:
- * - Non-blocking wait operations using virtual threads
- * - Automatic timeout management
- * - Reduces thread pool contention in parallel test execution
- * - Seamless integration with existing WebDriverWait patterns
+ * Uses Executors.newVirtualThreadPerTaskExecutor() which is available
+ * in Java 21+ for lightweight, scalable thread management.
  * 
- * Java 25 Improvements:
- * - Virtual Threads are now stable with performance enhancements
- * - Structured Concurrency (Project Panama) for better resource management
- * - Improved ThreadFactory support for virtual thread creation
- * 
- * @since Java 25
  * @author Automation Framework Team
  */
 public class VirtualThreadWaitUtils {
 
+    private static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
+
     /**
-     * Perform a non-blocking wait using virtual threads
+     * Execute an action with virtual thread (non-blocking)
      * 
-     * Example:
-     * <pre>
-     * VirtualThreadWaitUtils.waitWithVirtualThread(() -> {
-     *     webDriver.findElement(By.id("element")).click();
-     *     return true;
-     * }, Duration.ofSeconds(10));
-     * </pre>
-     * 
-     * @param action Supplier that returns boolean or throws exception on failure
+     * @param action Supplier that returns result or throws exception on failure
      * @param timeout Duration to wait before timing out
      * @param <T> Return type
      * @return Result from the supplier
@@ -52,15 +35,16 @@ public class VirtualThreadWaitUtils {
     public static <T> T waitWithVirtualThread(Supplier<T> action, Duration timeout) throws Exception {
         CompletableFuture<T> future = CompletableFuture.supplyAsync(
             action,
-            Thread.ofVirtual().factory()  // Java 25: Virtual Thread Factory
+            virtualThreadExecutor
         );
         
         try {
-            return future.orTimeout(timeout.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS).get();
-        } catch (java.util.concurrent.TimeoutException e) {
-            throw new java.util.concurrent.TimeoutException(
-                "Wait exceeded timeout of " + timeout.toSeconds() + " seconds"
-            );
+            return future.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS).get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof TimeoutException) {
+                throw (TimeoutException) e.getCause();
+            }
+            throw e;
         }
     }
 
@@ -81,7 +65,7 @@ public class VirtualThreadWaitUtils {
         // Use virtual thread for non-blocking wait execution
         CompletableFuture<T> future = CompletableFuture.supplyAsync(
             () -> wait.until(condition),
-            Thread.ofVirtual().factory()
+            virtualThreadExecutor
         );
         
         try {
@@ -93,7 +77,6 @@ public class VirtualThreadWaitUtils {
 
     /**
      * Parallel wait for multiple elements using virtual threads
-     * Demonstrates Java 25 structured concurrency capabilities
      * 
      * @param waitSuppliers Array of suppliers for parallel waits
      * @param timeout Total timeout for all waits
@@ -108,34 +91,63 @@ public class VirtualThreadWaitUtils {
         for (int i = 0; i < waitSuppliers.length; i++) {
             futures[i] = CompletableFuture.supplyAsync(
                 waitSuppliers[i],
-                Thread.ofVirtual().factory()  // Each wait gets its own virtual thread
+                virtualThreadExecutor
             );
         }
         
         try {
             CompletableFuture.allOf(futures)
-                .orTimeout(timeout.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS)
+                .orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
                 .get();
             
             Object[] results = new Object[futures.length];
             for (int i = 0; i < futures.length; i++) {
-                results[i] = futures[i].get();
+                results[i] = futures[i].getNow(null);
             }
             return results;
         } catch (Exception e) {
-            throw new RuntimeException("Parallel virtual thread wait failed: " + e.getMessage(), e);
+            throw new RuntimeException("Parallel virtual thread waits failed: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Create a virtual thread factory for custom wait scenarios
-     * Java 25 improvement: Enhanced thread creation with better resource management
+     * Create a virtual thread factory for custom thread creation
      * 
-     * @return VirtualThreadFactory configured for test automation
+     * @return ThreadFactory for creating virtual threads
      */
-    public static Thread.Builder.OfVirtual createWaitThreadBuilder() {
-        return Thread.ofVirtual()
-            .name("wait-", 0)  // Naming virtual threads for debugging
-            .inheritInheritableThreadLocals(true);  // Inherit test context
+    public static ThreadFactory createWaitThreadBuilder() {
+        return Thread.ofVirtual().factory();
+    }
+
+    /**
+     * Execute action in a virtual thread
+     * 
+     * @param action Action to execute
+     * @param <T> Return type
+     * @return Result from the action
+     */
+    public static <T> T executeInVirtualThread(Supplier<T> action) {
+        CompletableFuture<T> future = CompletableFuture.supplyAsync(action, virtualThreadExecutor);
+        try {
+            return future.get();
+        } catch (Exception e) {
+            throw new RuntimeException("Virtual thread execution failed: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Shutdown virtual thread executor gracefully
+     * Call this in test cleanup/teardown
+     */
+    public static void shutdown() {
+        virtualThreadExecutor.shutdown();
+        try {
+            if (!virtualThreadExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+                virtualThreadExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            virtualThreadExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
