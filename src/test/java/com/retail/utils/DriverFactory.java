@@ -42,15 +42,26 @@ public class DriverFactory {
         System.out.println("Browser name is: " + browserName);
         System.out.println("Headless mode: " + headless);
 
-        // Check if BrowserStack credentials are available
+        // Check if BrowserStack credentials are available (Priority order):
+        // 1. Environment variables (CI/CD preference)
+        // 2. browserstack.yml file (local development)
         String bsUsername = System.getenv("BROWSERSTACK_USERNAME");
         String bsAccessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
 
+        // If env vars are not set, try reading from browserstack.yml
+        if ((bsUsername == null || bsUsername.isEmpty()) || (bsAccessKey == null || bsAccessKey.isEmpty())) {
+            java.util.Map<String, String> bsConfig = BrowserStackConfigReader.getBrowserStackCredentials();
+            if (!bsConfig.isEmpty()) {
+                bsUsername = bsConfig.getOrDefault("userName", bsUsername);
+                bsAccessKey = bsConfig.getOrDefault("accessKey", bsAccessKey);
+            }
+        }
+
         if (bsUsername != null && bsAccessKey != null && !bsUsername.isEmpty() && !bsAccessKey.isEmpty()) {
-            System.out.println("BrowserStack credentials found. Routing to BrowserStack cloud...");
+            System.out.println("✓ BrowserStack credentials found. Routing to BrowserStack cloud...");
             tlDriver.set(createBrowserStackDriver(browserName, bsUsername, bsAccessKey));
         } else {
-            System.out.println("BrowserStack credentials not found. Using local WebDriver...");
+            System.out.println("✗ BrowserStack credentials not found. Using local WebDriver...");
             tlDriver.set(createLocalDriver(browserName, headless));
         }
 

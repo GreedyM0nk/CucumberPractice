@@ -353,79 +353,296 @@ public class NewAPITest {
 }
 ```
 
-## 🌐 BrowserStack Integration Details
+## 🔐 Authentication Testing - Login & Signup Feature
 
-### How It Works
+The framework now includes comprehensive authentication testing for the **Shopify Sauce Demo** store at `https://sauce-demo.myshopify.com/`
 
-The framework uses BrowserStack Java SDK with a javaagent that automatically detects environment variables:
+### Running Login & Signup Tests Locally
 
-- **If `BROWSERSTACK_USERNAME` is NOT set** → Tests run locally
-- **If `BROWSERSTACK_USERNAME` is set** → Tests route to BrowserStack cloud
+#### Run All Authentication Tests
 
-**No code changes needed!** The same test code works everywhere.
-
-### Configuration File
-
-Edit `browserstack.yml` to customize cloud execution:
-
-```yaml
-userName: souvikdutta_kjl3bT
-accessKey: pk6zemKnxPqzhh4MRevy
-
-platforms:
-  - os: Windows
-    osVersion: 10
-    browserName: Chrome
-    browserVersion: 120.0
-  
-  - os: OS X
-    osVersion: Monterey
-    browserName: Safari
-    browserVersion: 15.6
-  
-  - deviceName: iPhone 13
-    osVersion: 15
-    browserName: Chromium
-    deviceOrientation: portrait
-
-buildName: bstack-demo
-debug: true
-networkLogs: true
-consoleLogs: info
-```
-
-### Troubleshooting BrowserStack
-
-**Tests still running locally?**
 ```bash
-# Check if env vars are set
-echo $BROWSERSTACK_USERNAME
-echo $BROWSERSTACK_ACCESS_KEY
-
-# Set them (temporary for this session)
-export BROWSERSTACK_USERNAME=souvikdutta_kjl3bT
-export BROWSERSTACK_ACCESS_KEY=pk6zemKnxPqzhh4MRevy
-
-# Verify
-echo $BROWSERSTACK_USERNAME
+mvn clean test -Dcucumber.filter.tags="@Authentication"
 ```
 
-**Tests fail on cloud but pass locally?**
-- Check BrowserStack dashboard for video and detailed logs
-- Verify `browserstack.yml` has correct browser capabilities
-- Check network connectivity to BrowserStack servers
-- Review console logs in dashboard
+#### Run Only Signup Scenario
 
-**Slow execution on cloud?**
-- Cloud tests may be slower due to network latency
-- This is normal behavior
-- Run local tests for fast feedback during development
+```bash
+mvn clean test -Dcucumber.filter.tags="@Signup"
+```
 
-**Want to see results on BrowserStack dashboard?**
-- Login to: https://app-automate.browserstack.com/
-- Credentials: `souvikdutta_kjl3bT` / `pk6zemKnxPqzhh4MRevy`
-- Look for sessions with your build name
-- Click on any session to view video, logs, and screenshots
+#### Run Only Login Scenario
+
+```bash
+mvn clean test -Dcucumber.filter.tags="@Login"
+```
+
+#### Run Single Feature File
+
+```bash
+# Run only the login feature file
+mvn test -Dtest=ParallelRunner1 -Dcucumber.filter.tags="@Authentication"
+```
+
+### Running Login Tests on BrowserStack Cloud
+
+#### Quick Setup
+
+1. **Set your BrowserStack credentials:**
+```bash
+export BROWSERSTACK_USERNAME=your_username
+export BROWSERSTACK_ACCESS_KEY=your_access_key
+```
+
+2. **Run all authentication tests on cloud:**
+```bash
+mvn clean test -Dcucumber.filter.tags="@Authentication"
+```
+
+3. **Run signup only on cloud:**
+```bash
+mvn test -Dcucumber.filter.tags="@Signup"
+```
+
+4. **Run login only on cloud:**
+```bash
+mvn test -Dcucumber.filter.tags="@Login"
+```
+
+#### Monitor on BrowserStack Dashboard
+
+- **URL:** https://app-automate.browserstack.com/
+- **Username:** Your BrowserStack username
+- **Features:**
+  - ✅ Real-time execution monitoring
+  - ✅ Video recordings of signup/login flows
+  - ✅ Screenshots at each step
+  - ✅ Browser console logs
+  - ✅ Network activity logs
+  - ✅ Test session details and metadata
+
+### Understanding the Login Feature
+
+#### Feature File Location
+```
+src/test/resources/features/authentication/login.feature
+```
+
+#### Test Scenarios
+
+**Scenario 1: User signs up with a new account**
+- ✅ Navigates to home page
+- ✅ Clicks signup link
+- ✅ Enters unique email (auto-generated)
+- ✅ Enters password
+- ✅ Confirms password
+- ✅ Submits signup form
+- ✅ Verifies account creation and login
+
+**Scenario 2: User logs in with existing credentials**
+- ✅ Navigates to home page
+- ✅ Clicks login link
+- ✅ Enters email
+- ✅ Enters password
+- ✅ Submits login form
+- ✅ Verifies successful login and account access
+
+#### Key Locators (Sauce Demo Shopify Store)
+
+| Element | Locator | Type |
+|---------|---------|------|
+| Login Link | `id="customer_login_link"` | HTML ID |
+| Signup Link | `id="customer_register_link"` | HTML ID |
+| Login Email | `name="email"` | Input Name |
+| Login Password | `name="password"` | Input Name |
+| Login Button | `value="Sign In"` | Submit Button |
+| Signup Email | `name="customer[email]"` | Input Name |
+| Signup Password | `name="customer[password]"` | Input Name |
+| Confirm Password | `name="customer[password_confirmation]"` | Input Name |
+| Create Account | `value="Create"` | Submit Button |
+| Logout Link | `href="/account/logout"` | Link |
+
+### Page Object & Step Definitions
+
+#### Page Object Class
+```
+src/test/java/com/retail/pages/LoginPage.java
+```
+- Extends `BasePage` for reusable wait/action methods
+- Contains all locators as `@FindBy` annotations
+- Implements methods for:
+  - Navigation (home, login, signup pages)
+  - Form interactions (enter email, password, click buttons)
+  - Verification (check login status, account access)
+
+#### Step Definitions Class
+```
+src/test/java/com/retail/stepdefinitions/AuthenticationSteps.java
+```
+- Implements all Gherkin steps from the feature file
+- Auto-generates unique test emails to prevent conflicts
+- Includes proper waits and delays for page loads
+- Provides clear console output for debugging
+
+### Test Data Generation
+
+The framework automatically generates unique test emails using timestamps:
+
+```java
+testEmail = "newuser" + System.currentTimeMillis() + "@test.com";
+// Example: newuser1710854123456@test.com
+```
+
+**Benefits:**
+- ✅ Prevents "email already exists" errors
+- ✅ Allows multiple test runs without cleanup
+- ✅ Ensures test isolation
+- ✅ No hardcoded test data needed
+
+### Running via IntelliJ IDEA
+
+#### Option 1: Run Feature File Directly
+
+1. Navigate to: `src/test/resources/features/authentication/login.feature`
+2. Right-click on a scenario
+3. Select **Run 'Scenario'** or **Run 'Signup' Scenario**
+4. Watch test execution in the IDE
+5. View step-by-step output
+
+#### Option 2: Run with Environment Variables (Cloud)
+
+1. Right-click feature file → **Edit Run Configuration**
+2. Add environment variables:
+   ```
+   BROWSERSTACK_USERNAME=your_username
+   BROWSERSTACK_ACCESS_KEY=your_access_key
+   ```
+3. Click **Run** to execute on BrowserStack cloud
+
+#### Option 3: Run via Test Runner Class
+
+1. Navigate to: `src/test/java/com/retail/runners/ParallelRunner1.java`
+2. Right-click → **Edit Configuration**
+3. Add VM option:
+   ```
+   -Dcucumber.filter.tags=@Signup
+   ```
+4. Add environment variables for cloud (optional)
+5. Click **Run**
+
+### Debugging Failed Tests
+
+#### Check Console Output
+
+The framework provides detailed logging:
+
+```
+✓ User navigated to home page
+✓ Account menu navigation ready (direct links available)
+✓ User clicked on signup link
+✓ User entered email for signup: newuser1710854123456@test.com
+✓ User entered password for signup
+✓ User confirmed password
+✓ User clicked the create account button
+✓ User account created successfully. Current URL: https://sauce-demo.myshopify.com/account
+✓ User is successfully logged in
+```
+
+#### Common Issues & Solutions
+
+| Issue | Solution |
+|-------|----------|
+| "Element not found" | Check if page loaded correctly. Add more wait time. |
+| "Password fields not visible" | Ensure JavaScript is enabled and form is not hidden. |
+| "Email already exists" | Auto-generation uses timestamps, should be unique. |
+| "Login fails but form submitted" | Check if account was actually created. Try with known email. |
+| "Account page not accessible" | Verify logout link is present (login indicator). |
+
+#### Check Logs
+
+```bash
+# View detailed execution logs
+tail -f target/logs/automation.log
+
+# View with grep for errors
+grep -i "error\|failed" target/logs/automation.log
+```
+
+### Extending the Authentication Tests
+
+#### Add a New Scenario (Password Reset)
+
+1. Edit: `src/test/resources/features/authentication/login.feature`
+2. Add new scenario:
+```gherkin
+@Authentication @PasswordReset
+Scenario: User resets forgotten password
+  When user clicks on the account menu
+  And user clicks on login option
+  And user clicks on forgot password link
+  And user enters email for password reset
+  And user clicks the reset button
+  Then password reset email should be sent
+```
+
+3. Add step definitions in: `src/test/java/com/retail/stepdefinitions/AuthenticationSteps.java`
+4. Add methods in: `src/test/java/com/retail/pages/LoginPage.java`
+5. Run: `mvn test -Dcucumber.filter.tags="@PasswordReset"`
+
+#### Add Steps for Logout Testing
+
+```java
+@When("user clicks the logout button")
+public void user_clicks_the_logout_button() {
+    getLoginPage().logout();
+}
+
+@Then("user should be logged out")
+public void user_should_be_logged_out() {
+    boolean isLoggedOut = !getLoginPage().isUserLoggedIn();
+    Assert.assertTrue("User should be logged out", isLoggedOut);
+}
+```
+
+### CI/CD Integration
+
+Authentication tests run automatically on GitHub Actions:
+
+**Push to trigger:**
+```bash
+git add .
+git commit -m "Add authentication tests"
+git push origin main
+```
+
+**GitHub Actions will:**
+1. ✅ Execute all authentication tests on BrowserStack cloud
+2. ✅ Capture screenshots and videos
+3. ✅ Generate Allure reports
+4. ✅ Deploy reports to GitHub Pages
+5. ✅ Send results to BrowserStack dashboard
+
+### Best Practices for Authentication Testing
+
+1. **Use unique test emails** - Framework auto-generates via timestamps
+2. **Don't hardcode passwords** - Use environment variables in production
+3. **Test both success and failure paths** - Valid and invalid credentials
+4. **Clean up test data** - Or use timestamps for automatic isolation
+5. **Test on real browsers** - Use BrowserStack for cross-browser coverage
+6. **Monitor test execution** - Watch BrowserStack dashboard for issues
+7. **Capture screenshots** - Useful for debugging failed assertions
+8. **Include proper waits** - Let forms load before interactions
+
+### Performance Metrics
+
+When running on BrowserStack, monitor:
+
+- **Signup flow time:** Typically 8-12 seconds
+- **Login flow time:** Typically 6-10 seconds
+- **Account page load:** Should be < 3 seconds after login
+- **Form submission:** Should complete within 2-3 seconds
+
+Use BrowserStack logs to identify slow operations.
 
 ## 🤝 Contributing
 
@@ -465,4 +682,3 @@ For reference documentation:
 ---
 
 **Happy Testing! 🚀**
-

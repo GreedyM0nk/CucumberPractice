@@ -153,6 +153,26 @@ public class ProductPage extends BasePage {
 
 
     /**
+     * Wait for the browser URL to contain a product path, then return it.
+     * The Shopify demo site may use /collections/frontpage/products/<slug>
+     * or /products/<slug> — both contain "/products/".
+     * Uses an explicit 15-second wait so slow navigations don't cause false failures.
+     * @return Current URL after navigation completes
+     */
+    public String waitForProductDetailsUrl() {
+        try {
+            WebDriverWait navWait = new WebDriverWait(driver, java.time.Duration.ofSeconds(15));
+            navWait.until(ExpectedConditions.or(
+                ExpectedConditions.urlContains("/products/"),
+                ExpectedConditions.urlContains("/collections/")
+            ));
+        } catch (Exception e) {
+            // Return the current URL even if wait times out; assertion in step will handle it
+        }
+        return driver.getCurrentUrl();
+    }
+
+    /**
      * Check if product is displayed on catalogue page
      * @return true if at least one product is displayed
      */
