@@ -1,11 +1,13 @@
 package com.retail.stepdefinitions;
 
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import com.retail.utils.DriverFactory;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Duration;
@@ -56,5 +58,28 @@ public class CommonSteps {
     @Given("I refresh the current page")
     public void refreshPage() {
         driver.navigate().refresh();
+    }
+
+    // ─────────────────────────────────────────────
+    // COMMON VERIFICATION STEPS
+    // ─────────────────────────────────────────────
+
+    @Then("the page title should be {string}")
+    public void verifyPageTitle(String expectedTitle) {
+        String actualTitle = driver.getTitle();
+        assertEquals("Page title mismatch", expectedTitle, actualTitle);
+    }
+
+    @Then("the URL should contain {string}")
+    public void verifyUrlContains(String urlPart) {
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue("URL does not contain '" + urlPart + "'. Current URL: " + currentUrl,
+                currentUrl.contains(urlPart));
+    }
+
+    @Then("the URL should be {string}")
+    public void verifyUrlEquals(String expectedUrl) {
+        String currentUrl = driver.getCurrentUrl();
+        assertEquals("URL mismatch", expectedUrl, currentUrl);
     }
 }

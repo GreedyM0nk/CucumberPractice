@@ -67,22 +67,6 @@ public class FooterNavigationSteps {
     }
 
     // ─────────────────────────────────────────────
-    // PAGE NAVIGATION VERIFICATION STEPS
-    // ─────────────────────────────────────────────
-
-    @Then("the page title should be {string}")
-    public void verifyPageTitle(String expectedTitle) {
-        String actualTitle = wait.until(driver -> driver.getTitle());
-        assertEquals("Page title should match", expectedTitle, actualTitle);
-    }
-
-    @Then("the URL should contain {string}")
-    public void verifyUrlContains(String urlFragment) {
-        String actualUrl = wait.until(driver -> driver.getCurrentUrl());
-        assertTrue("URL should contain '" + urlFragment + "'", actualUrl.contains(urlFragment));
-    }
-
-    // ─────────────────────────────────────────────
     // FOOTER ABOUT US SECTION STEPS
     // ─────────────────────────────────────────────
 

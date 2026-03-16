@@ -47,25 +47,6 @@ public class HeaderNavigationSteps {
         headerPage.clickLinkInTopNavigation(linkText);
     }
 
-    @Then("the page title should be {string}")
-    public void verifyPageTitle(String expectedTitle) {
-        String actualTitle = webDriver.getTitle();
-        Assert.assertEquals("Page title mismatch", expectedTitle, actualTitle);
-    }
-
-    @Then("the URL should contain {string}")
-    public void verifyUrlContains(String urlPart) {
-        String currentUrl = webDriver.getCurrentUrl();
-        Assert.assertTrue(currentUrl.contains(urlPart),
-                "URL does not contain '" + urlPart + "'. Current URL: " + currentUrl);
-    }
-
-    @Then("the URL should be {string}")
-    public void verifyUrlEquals(String expectedUrl) {
-        String currentUrl = webDriver.getCurrentUrl();
-        Assert.assertEquals("URL mismatch", expectedUrl, currentUrl);
-    }
-
     // ─────────────────────────────────────────────
     // LOGO AND TAGLINE STEPS
     // ─────────────────────────────────────────────
