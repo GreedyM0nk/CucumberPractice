@@ -5,9 +5,15 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import org.openqa.selenium.WebDriver;
-import org.testng.Assert;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import com.retail.utils.DriverFactory;
 
-import static com.retail.runners.TestContext.driver;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
+
+import java.time.Duration;
 
 /**
  * Header Navigation Step Definitions
@@ -23,12 +29,14 @@ public class HeaderNavigationSteps {
 
     private HeaderPage headerPage;
     private WebDriver webDriver;
+    private WebDriverWait wait;
 
     /**
      * Constructor to initialize HeaderPage
      */
     public HeaderNavigationSteps() {
-        this.webDriver = driver;
+        this.webDriver = DriverFactory.getDriver();
+        this.wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
         this.headerPage = new HeaderPage(webDriver);
     }
 
@@ -39,7 +47,7 @@ public class HeaderNavigationSteps {
     @Then("I should see the link {string} in the top navigation bar")
     public void verifySeeLinkInTopNavBar(String linkText) {
         boolean linkExists = headerPage.isLinkInTopNavigation(linkText);
-        Assert.assertTrue(linkExists, "Link '" + linkText + "' not found in top navigation bar");
+        assertTrue("Link '" + linkText + "' not found in top navigation bar", linkExists);
     }
 
     @When("I click the {string} link in the top navigation bar")
@@ -54,13 +62,13 @@ public class HeaderNavigationSteps {
     @Then("I should see the site logo with alt text {string}")
     public void verifySiteLogoWithAltText(String altText) {
         boolean logoVisible = headerPage.isSiteLogoVisible(altText);
-        Assert.assertTrue(logoVisible, "Logo with alt text '" + altText + "' not visible");
+        assertTrue("Logo with alt text '" + altText + "' not visible", logoVisible);
     }
 
     @Then("I should see the tagline {string}")
     public void verifyTaglineText(String expectedTagline) {
         String taglineText = headerPage.getTaglineText();
-        Assert.assertEquals("Tagline mismatch", expectedTagline, taglineText);
+        assertEquals("Tagline mismatch", expectedTagline, taglineText);
     }
 
     @When("I click the {string} site logo")
@@ -75,7 +83,7 @@ public class HeaderNavigationSteps {
     @Then("I should see the link {string} in the side navigation")
     public void verifySeePointNavigationLink(String linkText) {
         boolean linkExists = headerPage.isLinkInSideNavigation(linkText);
-        Assert.assertTrue(linkExists, "Link '" + linkText + "' not found in side navigation");
+        assertTrue("Link '" + linkText + "' not found in side navigation", linkExists);
     }
 
     @When("I click the {string} link in the side navigation")
@@ -86,8 +94,8 @@ public class HeaderNavigationSteps {
     @Then("the {string} link in side navigation should have valid href")
     public void verifySideNavLinkHref(String linkText) {
         String href = headerPage.getLinkHrefInSideNavigation(linkText);
-        Assert.assertNotNull(href, "Link '" + linkText + "' has no href attribute");
-        Assert.assertFalse(href.isEmpty(), "Link '" + linkText + "' has empty href");
+        assertNotNull("Link '" + linkText + "' has no href attribute", href);
+        assertFalse("Link '" + linkText + "' has empty href", href.isEmpty());
     }
 
     @Then("all side navigation links should be clickable")
@@ -95,7 +103,7 @@ public class HeaderNavigationSteps {
         String[] sideNavLinks = {"Home", "Catalog", "Blog", "About Us", "Wish list", "Refer a friend"};
         for (String link : sideNavLinks) {
             if (headerPage.isLinkInSideNavigation(link)) {
-                Assert.assertTrue(true, "Link '" + link + "' is clickable");
+                assertTrue("Link '" + link + "' is clickable", true);
             }
         }
     }
@@ -103,15 +111,15 @@ public class HeaderNavigationSteps {
     @Then("the {string} link in side navigation should open in same tab")
     public void verifySideNavLinkSamsTab(String linkText) {
         String href = headerPage.getLinkHrefInSideNavigation(linkText);
-        Assert.assertFalse(href.contains("target=_blank"),
-                "Link '" + linkText + "' should not open in new tab");
+        assertFalse("Link '" + linkText + "' should not open in new tab",
+                href.contains("target=_blank"));
     }
 
     @Then("the side navigation layout should be responsive")
     public void verifySideNavResponsive() {
         // Verify side nav is visible and formatted correctly
-        Assert.assertTrue(headerPage.isLinkInSideNavigation("Home"),
-                "Side navigation not properly responsive");
+        assertTrue("Side navigation not properly responsive",
+                headerPage.isLinkInSideNavigation("Home"));
     }
 
     // ─────────────────────────────────────────────
@@ -121,7 +129,7 @@ public class HeaderNavigationSteps {
     @Then("I should see the {string} social icon link")
     public void verifySocialIconVisible(String socialMedia) {
         boolean iconVisible = headerPage.isSocialIconVisible(socialMedia);
-        Assert.assertTrue(iconVisible, socialMedia + " icon is not visible");
+        assertTrue(socialMedia + " icon is not visible", iconVisible);
     }
 
     @When("I click the {string} icon in the side navigation")
