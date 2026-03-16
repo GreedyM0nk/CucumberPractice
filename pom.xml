@@ -275,13 +275,20 @@
                 <configuration>
                     <!--
                         Run each *Runner class in its own forked JVM.
-                        forkCount=4 / reuseForks=false → true process isolation,
+                        forkCount=5 / reuseForks=false → true process isolation,
                         no ThreadLocal or static state can bleed between forks.
+                        
+                        Runners:
+                        - ParallelRunner1: @S1 - Add Product to Cart
+                        - ParallelRunner2: @S2 - Product Filtering
+                        - ParallelRunner3: @S3 - Checkout Flow
+                        - ParallelRunner4: @S4 - Authentication/Login
+                        - ParallelRunner5: @S5 - Footer Navigation & Content
                     -->
-                    <forkCount>4</forkCount>
+                    <forkCount>5</forkCount>
                     <reuseForks>false</reuseForks>
                     <parallel>classes</parallel>
-                    <threadCount>4</threadCount>
+                    <threadCount>5</threadCount>
 
                     <systemPropertyVariables>
                         <!-- Forward the active profile's env value into every forked JVM -->
@@ -289,10 +296,10 @@
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
 
-                    <!-- Keep running even if one runner fails so all 4 complete -->
+                    <!-- Keep running even if one runner fails so all 5 complete -->
                     <testFailureIgnore>true</testFailureIgnore>
 
-                    <!-- Only the 4 dedicated parallel runners execute during mvn test -->
+                    <!-- Only the 5 dedicated parallel runners execute during mvn test -->
                     <includes>
                         <include>**/ParallelRunner*.java</include>
                     </includes>
