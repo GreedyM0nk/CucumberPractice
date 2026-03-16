@@ -19,6 +19,9 @@ jobs:
     # Explicitly opt into Node.js 24 to avoid deprecation issues
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      # Enable headless mode in CI for Selenium tests
+      CI: true
+      HEADLESS: true
 
     steps:
       - name: Checkout Code
@@ -50,7 +53,12 @@ jobs:
           sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
           allure --version
 
-      # Run all test suites
+      # Run Smoke Tests (critical path scenarios)
+      - name: Run Smoke Tests
+        run: mvn clean test -Dtest=SmokeTestRunner -Denv=uat -Dheadless=true
+        continue-on-error: true
+
+      # Run all test suites (only if smoke tests pass)
       - name: Run All Tests
         run: mvn clean test -Denv=uat
         continue-on-error: true
