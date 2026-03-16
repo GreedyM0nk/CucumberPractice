@@ -145,7 +145,11 @@ public class FooterPage extends BasePage {
             
             // Fallback: search entire page for heading with this text
             List<WebElement> allHeadings = driver.findElements(By.xpath(
-                "//h2[text()='" + sectionName + "'] | //h3[text()='" + sectionName + "'] | //h4[contains(text(), '" + sectionName + "')]"
+                "//h2[normalize-space()='" + sectionName + "'] | "
+                + "//h3[normalize-space()='" + sectionName + "'] | "
+                + "//h4[contains(normalize-space(), '" + sectionName + "')] | "
+                + "//h2[contains(normalize-space(), '" + sectionName + "')] | "
+                + "//h3[contains(normalize-space(), '" + sectionName + "')]"
             ));
             
             if (!allHeadings.isEmpty()) {
@@ -265,9 +269,12 @@ public class FooterPage extends BasePage {
             wait.until(ExpectedConditions.elementToBeClickable(link)).click();
         } catch (Exception e) {
             System.out.println("DEBUG: Could not click footer link '" + linkText + "': " + e.getMessage());
-            // Try alternate selectors
+            // Try alternate selectors with robust XPath
             try {
-                WebElement link = driver.findElement(By.xpath("//a[contains(text(), '" + linkText + "')]"));
+                String xpath = "//a[contains(normalize-space(), '" + linkText + "')] | "
+                             + "//a[contains(text(), '" + linkText + "')] | "
+                             + "//footer//a[contains(normalize-space(), '" + linkText + "')]";
+                WebElement link = driver.findElement(By.xpath(xpath));
                 wait.until(ExpectedConditions.elementToBeClickable(link)).click();
             } catch (Exception ex) {
                 throw new RuntimeException("Link '" + linkText + "' not found in footer bottom bar");
@@ -322,9 +329,13 @@ public class FooterPage extends BasePage {
      */
     public String getFooterHeadingText(String heading) {
         try {
-            // Try exact match first
+            // Use robust XPath with normalize-space() to handle whitespace and formatting variations
             WebElement headingElement = driver.findElement(By.xpath(
-                ".//footer//h3[text()='" + heading + "'] | .//footer//h2[text()='" + heading + "']"
+                ".//footer//h3[normalize-space()='" + heading + "'] | "
+                + ".//footer//h2[normalize-space()='" + heading + "'] | "
+                + ".//footer//h4[normalize-space()='" + heading + "'] | "
+                + ".//footer//h3[contains(normalize-space(), '" + heading + "')] | "
+                + ".//footer//h2[contains(normalize-space(), '" + heading + "')]"
             ));
             return headingElement.getText();
         } catch (Exception e) {

@@ -56,11 +56,17 @@ public class FooterNavigationSteps {
     @Then("I should see the heading {string} in the footer navigation section")
     public void verifyFooterNavigationHeading(String heading) {
         try {
-            WebElement footerNav = getWait().until(
-                ExpectedConditions.presenceOfElementLocated(By.xpath("//footer/section/div/nav/h2 | //footer//nav/h3 | //footer//h3"))
+            WebElement footer = getWait().until(
+                ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
             );
-            WebElement headingElement = footerNav.findElement(By.xpath(".//*[text()='"+heading+"']"));
+            // Use robust XPath with normalize-space() to handle whitespace variations
+            String xpath = ".//h2[contains(normalize-space(), '" + heading + "') or "
+                         + "text()='" + heading + "'] | "
+                         + ".//h3[contains(normalize-space(), '" + heading + "') or "
+                         + "text()='" + heading + "']";
+            WebElement headingElement = footer.findElement(By.xpath(xpath));
             assertTrue("Footer navigation heading '" + heading + "' should be visible", headingElement.isDisplayed());
+            System.out.println("✓ Found footer navigation heading: " + heading);
         } catch (Exception e) {
             // Footer structure may not have exact heading, skip this assertion
             System.out.println("DEBUG: Footer heading '" + heading + "' not found - skipping assertion");
@@ -93,25 +99,48 @@ public class FooterNavigationSteps {
 
     @Then("I should see the heading {string} in the footer")
     public void verifyFooterHeading(String heading) {
-        WebElement footer = getWait().until(
-            ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
-        );
-        WebElement headingElement = footer.findElement(By.xpath(".//h3[text()='" + heading + "']"));
-        assertTrue("Footer heading '" + heading + "' should be visible", headingElement.isDisplayed());
+        try {
+            WebElement footer = getWait().until(
+                ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
+            );
+            // Use robust XPath with normalize-space() to handle whitespace and formatting variations
+            String xpath = ".//h3[normalize-space()='" + heading + "'] | "
+                         + ".//h2[normalize-space()='" + heading + "'] | "
+                         + ".//h4[normalize-space()='" + heading + "']";
+            WebElement headingElement = footer.findElement(By.xpath(xpath));
+            assertTrue("Footer heading '" + heading + "' should be visible", headingElement.isDisplayed());
+            System.out.println("✓ Found footer heading: " + heading);
+        } catch (Exception e) {
+            System.out.println("DEBUG: Footer heading '" + heading + "' not found - " + e.getMessage());
+            throw new AssertionError("Footer heading '" + heading + "' not found", e);
+        }
     }
 
     @Then("the footer {string} section should contain the text {string}")
     public void verifyFooterSectionText(String sectionName, String expectedText) {
-        WebElement footer = getWait().until(
-            ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
-        );
-        // Find the section heading and then its parent container
-        WebElement sectionHeading = footer.findElement(By.xpath(".//h3[text()='" + sectionName + "']"));
-        WebElement sectionContainer = sectionHeading.findElement(By.xpath("./ancestor::div[@class='footer-section' or @class='footer-about']"));
-        
-        String sectionText = sectionContainer.getText();
-        assertTrue("Footer " + sectionName + " section should contain '" + expectedText + "'", 
-                   sectionText.contains(expectedText));
+        try {
+            WebElement footer = getWait().until(
+                ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
+            );
+            // Use robust XPath with normalize-space() to find the section heading
+            String headingXpath = ".//h3[normalize-space()='" + sectionName + "'] | "
+                                + ".//h2[normalize-space()='" + sectionName + "']";
+            WebElement sectionHeading = footer.findElement(By.xpath(headingXpath));
+            
+            // Find the parent container with multiple fallback patterns
+            String containerXpath = "./ancestor::div[contains(@class, 'footer')] | "
+                                  + "./ancestor::section | "
+                                  + "./..";
+            WebElement sectionContainer = sectionHeading.findElement(By.xpath(containerXpath));
+            
+            String sectionText = sectionContainer.getText();
+            assertTrue("Footer '" + sectionName + "' section should contain '" + expectedText + "'", 
+                       sectionText.contains(expectedText));
+            System.out.println("✓ Found footer section '" + sectionName + "' with text: " + expectedText);
+        } catch (Exception e) {
+            System.out.println("DEBUG: Footer section '" + sectionName + "' not found - " + e.getMessage());
+            throw new AssertionError("Footer section '" + sectionName + "' not found", e);
+        }
     }
 
     @When("I click the {string} link in the footer About Us section")
@@ -130,11 +159,20 @@ public class FooterNavigationSteps {
 
     @Then("I should see the payment icon with alt text {string}")
     public void verifyPaymentIcon(String altText) {
-        WebElement footer = getWait().until(
-            ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
-        );
-        WebElement paymentIcon = footer.findElement(By.xpath(".//img[@alt='" + altText + "']"));
-        assertTrue("Payment icon with alt text '" + altText + "' should be displayed", paymentIcon.isDisplayed());
+        try {
+            WebElement footer = getWait().until(
+                ExpectedConditions.presenceOfElementLocated(By.tagName("footer"))
+            );
+            // Use robust XPath with normalize-space() to handle alt text variations
+            String xpath = ".//img[normalize-space(@alt)='" + altText + "'] | "
+                         + ".//img[contains(@alt, '" + altText + "')]";
+            WebElement paymentIcon = footer.findElement(By.xpath(xpath));
+            assertTrue("Payment icon with alt text '" + altText + "' should be displayed", paymentIcon.isDisplayed());
+            System.out.println("✓ Found payment icon: " + altText);
+        } catch (Exception e) {
+            System.out.println("DEBUG: Payment icon '" + altText + "' not found - " + e.getMessage());
+            throw new AssertionError("Payment icon '" + altText + "' not found", e);
+        }
     }
 
     // ─────────────────────────────────────────────

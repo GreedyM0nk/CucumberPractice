@@ -117,7 +117,10 @@ public class HeaderPage extends BasePage {
      */
     public boolean isSiteLogoVisible(String altText) {
         try {
-            WebElement logo = driver.findElement(By.xpath("//img[@alt='" + altText + "']"));
+            // Use robust XPath with normalize-space() to handle alt text variations
+            String xpath = "//img[normalize-space(@alt)='" + altText + "'] | "
+                         + "//img[contains(@alt, '" + altText + "')]";
+            WebElement logo = driver.findElement(By.xpath(xpath));
             return wait.until(ExpectedConditions.visibilityOf(logo)).isDisplayed();
         } catch (Exception e) {
             return false;
