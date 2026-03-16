@@ -15,6 +15,10 @@ permissions:
 jobs:
   test-and-report:
     runs-on: ubuntu-latest
+    
+    # Explicitly opt into Node.js 24 to avoid deprecation issues
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout Code
