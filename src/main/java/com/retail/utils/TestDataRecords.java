@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Java 25 Records for Test Automation Data Models
+ * Java 21+ Records for Test Automation Data Models
  * 
- * Java 25 Records provide:
+ * Java Records provide (available since Java 16+):
  * - Concise syntax for immutable data classes
  * - Automatic equals(), hashCode(), toString()
  * - Better performance than traditional classes
@@ -15,7 +15,7 @@ import java.util.List;
  * These records replace boilerplate code for test data structures
  * while providing all the necessary functionality.
  * 
- * @since Java 25
+ * @since Java 16+ (Records), Java 21+ (All features used here)
  * @author Automation Framework Team
  */
 public class TestDataRecords {

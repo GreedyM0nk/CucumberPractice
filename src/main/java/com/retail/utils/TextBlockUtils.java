@@ -1,17 +1,17 @@
 package com.retail.utils;
 
 /**
- * Java 25 Text Blocks and String Formatting Utilities
+ * Java 21+ Text Blocks and String Formatting Utilities
  * 
- * Demonstrates Java 25 improvements in text blocks:
- * - Multi-line string literals
- * - String template integration (Preview feature)
+ * Demonstrates modern Java improvements in text blocks:
+ * - Multi-line string literals (Java 15+)
+ * - String formatting with .formatted() (Java 21+)
  * - Improved formatting for HTML, JSON, and other text formats
  * 
  * Text blocks improve readability for multi-line string content like
  * error messages, JSON payloads, and HTML templates.
  * 
- * @since Java 25
+ * @since Java 15+ (Text Blocks), Java 21+ (Formatting)
  * @author Automation Framework Team
  */
 public class TextBlockUtils {

@@ -18,7 +18,7 @@ A comprehensive **Behavior Driven Development (BDD)** test automation framework 
 
 | Component | Version |
 |-----------|---------|
-| Java | JDK 21 |
+| Java | Java 21 LTS |
 | Selenium WebDriver | 4.41.0 |
 | Cucumber | 7.15.0 |
 | REST Assured | 5.4.0 |
