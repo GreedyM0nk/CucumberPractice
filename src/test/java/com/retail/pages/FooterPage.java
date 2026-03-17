@@ -25,48 +25,53 @@ public class FooterPage extends BasePage {
     // ─────────────────────────────────────────────
     // FOOTER STRUCTURE LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred (if available): [data-testid='footer-section'], [data-testid='footer-nav'], etc.
 
     @FindBy(tagName = "footer")
     private WebElement footerElement;
 
-    @FindBy(css = "footer nav, footer .footer-navigation")
+    @FindBy(css = "[data-testid='footer-nav'], footer nav, footer .footer-navigation")
     private WebElement footerNavigation;
 
-    @FindBy(css = "footer .footer-bottom, footer .footer-bar")
+    @FindBy(css = "[data-testid='footer-bottom'], footer .footer-bottom, footer .footer-bar")
     private WebElement footerBottomBar;
 
-    @FindBy(css = "footer .footer-section, footer .footer-about")
+    @FindBy(css = "[data-testid='footer-sections'], footer .footer-section, footer .footer-about")
     private List<WebElement> footerSections;
 
     // ─────────────────────────────────────────────
     // FOOTER NAVIGATION LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='footer-nav-heading'], [data-testid='footer-nav-links']
 
-    @FindBy(css = "footer nav h3")
+    @FindBy(css = "[data-testid='footer-nav-heading'], footer nav h3, footer nav h2")
     private WebElement footerNavHeading;
 
-    @FindBy(css = "footer nav a")
+    @FindBy(css = "[data-testid='footer-nav-links'], footer nav a")
     private List<WebElement> footerNavLinks;
 
     // ─────────────────────────────────────────────
     // ABOUT US SECTION LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='footer-section-heading']
 
-    @FindBy(css = "footer .footer-section h3, footer .footer-about h3")
+    @FindBy(css = "[data-testid='footer-section-heading'], footer .footer-section h3, footer .footer-about h3, footer h2")
     private List<WebElement> footerSectionHeadings;
 
     // ─────────────────────────────────────────────
     // PAYMENT ICONS LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='payment-icon']
 
-    @FindBy(css = "footer .footer-payments img, footer .payment-icons img")
+    @FindBy(css = "[data-testid='payment-icon'], footer .footer-payments img, footer .payment-icons img, footer .payments img")
     private List<WebElement> paymentIcons;
 
     // ─────────────────────────────────────────────
     // BOTTOM BAR LOCATORS
     // ─────────────────────────────────────────────
+    // Preferred: [data-testid='footer-bottom-link']
 
-    @FindBy(css = "footer .footer-bottom a, footer .footer-bar a")
+    @FindBy(css = "[data-testid='footer-bottom-link'], footer .footer-bottom a, footer .footer-bar a")
     private List<WebElement> bottomBarLinks;
 
     // ─────────────────────────────────────────────
@@ -125,14 +130,43 @@ public class FooterPage extends BasePage {
     // ─────────────────────────────────────────────
 
     /**
-     * Get footer section by name
+     * Get footer section by name - finds heading and returns containing section
      */
     public WebElement getFooterSection(String sectionName) {
-        return footerSectionHeadings.stream()
-                .filter(heading -> heading.getText().equalsIgnoreCase(sectionName))
-                .map(heading -> heading.findElement(By.xpath("./ancestor::div[@class='footer-section' or @class='footer-about']")))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Footer section '" + sectionName + "' not found"));
+        try {
+            // Try to find heading in footer first
+            WebElement footer = driver.findElement(By.cssSelector("footer, [role='contentinfo']"));
+            List<WebElement> headings = footer.findElements(By.cssSelector("h2, h3, h4, h5, h6"));
+            
+            WebElement foundHeading = headings.stream()
+                    .filter(h -> h.getText().equalsIgnoreCase(sectionName))
+                    .findFirst()
+                    .orElse(null);
+            
+            if (foundHeading != null) {
+                // Return the parent section containing this heading
+                return foundHeading.findElement(By.xpath("./ancestor::*[contains(@class, 'section') or contains(@class, 'footer-') or contains(@class, 'about')] | ./.."));
+            }
+            
+            // Fallback: search entire page for heading with this text
+            List<WebElement> allHeadings = driver.findElements(By.xpath(
+                "//h2[normalize-space()='" + sectionName + "'] | "
+                + "//h3[normalize-space()='" + sectionName + "'] | "
+                + "//h4[contains(normalize-space(), '" + sectionName + "')] | "
+                + "//h2[contains(normalize-space(), '" + sectionName + "')] | "
+                + "//h3[contains(normalize-space(), '" + sectionName + "')]"
+            ));
+            
+            if (!allHeadings.isEmpty()) {
+                WebElement heading = allHeadings.get(0);
+                return heading.findElement(By.xpath("./ancestor::div[contains(@class, 'footer')] | ./.."));
+            }
+            
+            throw new RuntimeException("Footer section '" + sectionName + "' not found");
+        } catch (Exception e) {
+            System.out.println("DEBUG: Footer section '" + sectionName + "' lookup failed: " + e.getMessage());
+            throw new RuntimeException("Footer section '" + sectionName + "' not found", e);
+        }
     }
 
     /**
@@ -240,9 +274,12 @@ public class FooterPage extends BasePage {
             wait.until(ExpectedConditions.elementToBeClickable(link)).click();
         } catch (Exception e) {
             System.out.println("DEBUG: Could not click footer link '" + linkText + "': " + e.getMessage());
-            // Try alternate selectors
+            // Try alternate selectors with robust XPath
             try {
-                WebElement link = driver.findElement(By.xpath("//a[contains(text(), '" + linkText + "')]"));
+                String xpath = "//a[contains(normalize-space(), '" + linkText + "')] | "
+                             + "//a[contains(text(), '" + linkText + "')] | "
+                             + "//footer//a[contains(normalize-space(), '" + linkText + "')]";
+                WebElement link = driver.findElement(By.xpath(xpath));
                 wait.until(ExpectedConditions.elementToBeClickable(link)).click();
             } catch (Exception ex) {
                 throw new RuntimeException("Link '" + linkText + "' not found in footer bottom bar");
@@ -297,9 +334,13 @@ public class FooterPage extends BasePage {
      */
     public String getFooterHeadingText(String heading) {
         try {
-            // Try exact match first
+            // Use robust XPath with normalize-space() to handle whitespace and formatting variations
             WebElement headingElement = driver.findElement(By.xpath(
-                ".//footer//h3[text()='" + heading + "'] | .//footer//h2[text()='" + heading + "']"
+                ".//footer//h3[normalize-space()='" + heading + "'] | "
+                + ".//footer//h2[normalize-space()='" + heading + "'] | "
+                + ".//footer//h4[normalize-space()='" + heading + "'] | "
+                + ".//footer//h3[contains(normalize-space(), '" + heading + "')] | "
+                + ".//footer//h2[contains(normalize-space(), '" + heading + "')]"
             ));
             return headingElement.getText();
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package com.retail.stepdefinitions;
 
 import com.retail.pages.LoginPage;
 import com.retail.utils.DriverFactory;
+import com.retail.utils.TestDataProvider;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
@@ -62,14 +63,14 @@ public class AuthenticationSteps {
 
     @When("user enters email for login")
     public void user_enters_email_for_login() {
-        testEmail = "testuser" + System.currentTimeMillis() + "@test.com";
+        testEmail = TestDataProvider.getValidEmail();
         getLoginPage().enterLoginEmail(testEmail);
         System.out.println("✓ User entered email for login: " + testEmail);
     }
 
     @When("user enters password for login")
     public void user_enters_password_for_login() {
-        String testPassword = "Test@123456";
+        String testPassword = TestDataProvider.getValidPassword();
         getLoginPage().enterLoginPassword(testPassword);
         System.out.println("✓ User entered password for login");
     }
@@ -82,35 +83,35 @@ public class AuthenticationSteps {
 
     @When("user enters email for signup")
     public void user_enters_email_for_signup() {
-        testEmail = "newuser" + System.currentTimeMillis() + "@test.com";
+        testEmail = TestDataProvider.getValidEmail();
         getLoginPage().enterSignupEmail(testEmail);
         System.out.println("✓ User entered email for signup: " + testEmail);
     }
 
     @When("user enters first name for signup")
     public void user_enters_first_name_for_signup() {
-        String firstName = "Test";
+        String firstName = TestDataProvider.get("testuser.firstname");
         getLoginPage().enterSignupFirstName(firstName);
         System.out.println("✓ User entered first name for signup: " + firstName);
     }
 
     @When("user enters last name for signup")
     public void user_enters_last_name_for_signup() {
-        String lastName = "User";
+        String lastName = TestDataProvider.get("testuser.lastname");
         getLoginPage().enterSignupLastName(lastName);
         System.out.println("✓ User entered last name for signup: " + lastName);
     }
 
     @When("user enters password for signup")
     public void user_enters_password_for_signup() {
-        String testPassword = "Test@123456";
+        String testPassword = TestDataProvider.getValidPassword();
         getLoginPage().enterSignupPassword(testPassword);
         System.out.println("✓ User entered password for signup");
     }
 
     @When("user confirms password")
     public void user_confirms_password() {
-        String testPassword = "Test@123456";
+        String testPassword = TestDataProvider.getValidPassword();
         getLoginPage().confirmSignupPassword(testPassword);
         System.out.println("✓ User confirmed password");
     }

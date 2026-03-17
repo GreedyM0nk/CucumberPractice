@@ -15,29 +15,33 @@ import java.util.List;
  */
 public class CartPage extends BasePage {
 
-    // Page Locators
-    @FindBy(css = ".cart-target, #cart-target-desktop, #cart-target-mobile")
+    // ─────────────────────────────────────────────
+    // CART LOCATORS
+    // ─────────────────────────────────────────────
+    // Preferred: [data-testid='cart-count'], [data-testid='cart-link'], [data-testid='checkout-button']
+
+    @FindBy(css = "[data-testid='cart-count'], .cart-target, #cart-target-desktop, #cart-target-mobile")
     private WebElement cartCount;
 
-    @FindBy(css = "a.toggle-drawer.cart, a[href='/cart']")
+    @FindBy(css = "[data-testid='cart-link'], a.toggle-drawer.cart, a[href='/cart']")
     private WebElement cartLink;
 
-    @FindBy(css = "a.checkout, a[href*='checkout']")
+    @FindBy(css = "[data-testid='checkout-button'], a.checkout, a[href*='checkout']")
     private WebElement checkoutButton;
 
-    @FindBy(css = "#drawer .container, .cart-wrapper")
+    @FindBy(css = "[data-testid='cart-drawer'], #drawer .container, .cart-wrapper")
     private WebElement cartDrawer;
 
-    @FindBy(css = ".empty, .cart-empty")
+    @FindBy(css = "[data-testid='empty-cart-message'], .empty, .cart-empty")
     private WebElement emptyCartMessage;
 
-    @FindBy(css = ".line-item, .cart-item, tbody tr")
+    @FindBy(css = "[data-testid='cart-item'], .line-item, .cart-item, tbody tr")
     private List<WebElement> cartItems;
 
-    @FindBy(css = ".item-title, .cart-item-title")
+    @FindBy(css = "[data-testid='item-title'], .item-title, .cart-item-title")
     private WebElement firstItemName;
 
-    @FindBy(css = ".item-price, .cart-item-price")
+    @FindBy(css = "[data-testid='item-price'], .item-price, .cart-item-price")
     private WebElement firstItemPrice;
 
     @FindBy(css = ".subtotal, .cart-subtotal")

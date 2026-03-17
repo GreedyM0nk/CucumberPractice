@@ -53,8 +53,10 @@ public class DriverFactory {
 
         driver.manage().deleteAllCookies();
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(
-            Duration.ofSeconds(Long.parseLong(prop.getProperty("implicitWait", "10"))));
+        // Implicit waits are DISABLED (set to ZERO) - we use explicit waits only in page objects
+        // This prevents conflicts between implicit and explicit wait strategies
+        // All waits must use WebDriverWait with ExpectedConditions in BasePage
+        driver.manage().timeouts().implicitlyWait(Duration.ZERO);
         driver.get(baseUrl);
 
         return driver;

@@ -213,6 +213,14 @@ public class HeaderNavigationSteps {
     }
 
     /**
+     * Specific step for clicking Twitter icon
+     */
+    @When("I click the Twitter icon in the side navigation")
+    public void i_click_the_twitter_icon_in_the_side_navigation() {
+        clickSocialIconInSideNav("twitter");
+    }
+
+    /**
      * Specific step for clicking Instagram icon
      */
     @When("I click the Instagram icon in the side navigation")
