@@ -4,18 +4,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Java 21+ Records for Test Automation Data Models
+ * Java 25 Records for Test Automation Data Models
  * 
  * Java Records provide (available since Java 16+):
  * - Concise syntax for immutable data classes
  * - Automatic equals(), hashCode(), toString()
  * - Better performance than traditional classes
- * - Type-safe data handling
+ * - Type-safe data handling with Java 25 enhancements
  * 
  * These records replace boilerplate code for test data structures
  * while providing all the necessary functionality.
  * 
- * @since Java 16+ (Records), Java 21+ (All features used here)
+ * @since Java 16+ (Records), Java 21+ (All features), Java 25 (Enhanced)
  * @author Automation Framework Team
  */
 public class TestDataRecords {
@@ -34,7 +34,7 @@ public class TestDataRecords {
             boolean enableVirtualThreads,
             String environment) {
         /**
-         * Custom compact constructor for validation (Java 21+ feature)
+         * Custom compact constructor for validation (Java 25 feature)
          */
         public TestConfig {
             if (baseUrl == null || baseUrl.isEmpty()) {
@@ -202,7 +202,7 @@ public class TestDataRecords {
             int pageLoadStrategy, // 0: normal, 1: eager, 2: none
             boolean strictFileInteractability) {
         /**
-         * Convenience static factories (Java 21+ feature)
+         * Convenience static factories (Java 25 feature)
          */
         public static BrowserCapability chromeHeadless() {
             return new BrowserCapability("chrome", "latest", "linux", true, 0, false);
@@ -227,7 +227,7 @@ public class TestDataRecords {
             long pollIntervalMs,
             String conditionDescription) {
         /**
-         * Standard wait strategies as static fields (Java 21+)
+         * Standard wait strategies as static fields (Java 25)
          */
         public static final WaitStrategy QUICK = new WaitStrategy("element", 5000, 500, "Quick 5-second wait");
 

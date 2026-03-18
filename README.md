@@ -18,14 +18,14 @@ A comprehensive **Behavior Driven Development (BDD)** test automation framework 
 
 | Component | Version |
 |-----------|---------|
-| Java | Java 21 LTS |
+| Java | Java 25 |
 | Selenium WebDriver | 4.41.0 |
 | Cucumber | 7.15.0 |
 | REST Assured | 5.4.0 |
 | BrowserStack SDK | LATEST |
 | Maven | 3.8.1+ |
-| Log4j 2.x | 2.24.1 |
-| Allure Reports | 2.24.0 |
+| Log4j 2.x | 2.24.2 |
+| Allure Reports | 2.28.0 |
 
 ## 📂 Project Structure
 

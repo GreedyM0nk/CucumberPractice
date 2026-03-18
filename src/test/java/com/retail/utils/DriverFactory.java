@@ -37,11 +37,11 @@ public class DriverFactory {
      */
     public WebDriver init_driver(Properties prop) {
         String browserName = prop.getProperty("browser").trim();
-        
+
         // Check if running in CI environment (GitHub Actions, etc.)
-        boolean isCIEnvironment = Boolean.parseBoolean(System.getenv("CI")) || 
-                                  Boolean.parseBoolean(System.getenv("HEADLESS"));
-        
+        boolean isCIEnvironment = Boolean.parseBoolean(System.getenv("CI")) ||
+                Boolean.parseBoolean(System.getenv("HEADLESS"));
+
         // Read headless from properties, but override with CI environment
         boolean headless = isCIEnvironment || Boolean.parseBoolean(prop.getProperty("headless", "false"));
 
@@ -57,7 +57,8 @@ public class DriverFactory {
 
         driver.manage().deleteAllCookies();
         driver.manage().window().maximize();
-        // Implicit waits are DISABLED (set to ZERO) - we use explicit waits only in page objects
+        // Implicit waits are DISABLED (set to ZERO) - we use explicit waits only in
+        // page objects
         // This prevents conflicts between implicit and explicit wait strategies
         // All waits must use WebDriverWait with ExpectedConditions in BasePage
         driver.manage().timeouts().implicitlyWait(Duration.ZERO);
@@ -74,7 +75,7 @@ public class DriverFactory {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--disable-blink-features=AutomationControlled");
             options.addArguments("--disable-extensions");
-            
+
             if (headless) {
                 options.addArguments("--headless=new");
                 options.addArguments("--no-sandbox");
@@ -86,17 +87,19 @@ public class DriverFactory {
 
         } else if (browserName.equalsIgnoreCase("firefox")) {
             FirefoxOptions options = new FirefoxOptions();
-            if (headless) options.addArguments("--headless");
+            if (headless)
+                options.addArguments("--headless");
             return new FirefoxDriver(options);
 
         } else if (browserName.equalsIgnoreCase("edge")) {
             EdgeOptions options = new EdgeOptions();
-            if (headless) options.addArguments("--headless=new");
+            if (headless)
+                options.addArguments("--headless=new");
             return new EdgeDriver(options);
 
         } else {
             throw new IllegalArgumentException(
-                "Unsupported browser: '" + browserName + "'. Use chrome, firefox, or edge.");
+                    "Unsupported browser: '" + browserName + "'. Use chrome, firefox, or edge.");
         }
     }
 
@@ -117,7 +120,8 @@ public class DriverFactory {
     }
 
     /**
-     * Removes the WebDriver and baseUrl from the current thread's ThreadLocal slots.
+     * Removes the WebDriver and baseUrl from the current thread's ThreadLocal
+     * slots.
      * MUST be called after driver.quit() to prevent memory leaks in thread pools.
      */
     public static void removeDriver() {
@@ -125,4 +129,3 @@ public class DriverFactory {
         tlBaseUrl.remove();
     }
 }
-

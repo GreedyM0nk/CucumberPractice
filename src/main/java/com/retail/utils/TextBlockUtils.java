@@ -1,23 +1,23 @@
 package com.retail.utils;
 
 /**
- * Java 21+ Text Blocks and String Formatting Utilities
+ * Java 25 Text Blocks and String Formatting Utilities
  * 
- * Demonstrates modern Java improvements in text blocks:
+ * Demonstrates Java 25 improvements in text blocks:
  * - Multi-line string literals (Java 15+)
  * - String formatting with .formatted() (Java 21+)
- * - Improved formatting for HTML, JSON, and other text formats
+ * - Advanced formatting for HTML, JSON, and other text formats
  * 
  * Text blocks improve readability for multi-line string content like
  * error messages, JSON payloads, and HTML templates.
  * 
- * @since Java 15+ (Text Blocks), Java 21+ (Formatting)
+ * @since Java 15+ (Text Blocks), Java 21+ (Formatting), Java 25 (Enhanced)
  * @author Automation Framework Team
  */
 public class TextBlockUtils {
 
     /**
-     * Generate a formatted test report using Java 21+ text blocks
+     * Generate a formatted test report using Java 25 text blocks
      */
     public static String generateTestReportHeader(String testName, String environment, String timestamp) {
         return """
@@ -27,14 +27,14 @@ public class TextBlockUtils {
                 ║ Test Name      : %s
                 ║ Environment    : %s
                 ║ Timestamp      : %s
-                ║ Java Version   : 21+
-                ║ Framework      : Retail Automation (Java 21+ LTS)
+                ║ Java Version   : 25
+                ║ Framework      : Retail Automation (Java 25)
                 ╚════════════════════════════════════════════════════════════╝""".formatted(testName, environment,
                 timestamp);
     }
 
     /**
-     * HTML template using Java 21+ text blocks
+     * HTML template using Java 25 text blocks
      * Much more readable than concatenated strings
      */
     public static String generateAllureReportTemplate(String reportTitle, String version) {
@@ -145,11 +145,11 @@ public class TextBlockUtils {
     }
 
     /**
-     * Escaped sequences in text blocks (Java 21+ improvement)
+     * Escaped sequences in text blocks (Java 25 improvement)
      */
     public static String getFrameworkFeatures() {
         return """
-                Retail Automation Framework - Java 21+ LTS Features:
+                Retail Automation Framework - Java 25 Features:
 
                 🔹 Virtual Threads (Project Loom)
                    - Lightweight, millions of concurrent threads
