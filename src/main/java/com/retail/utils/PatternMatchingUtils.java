@@ -1,23 +1,23 @@
 package com.retail.utils;
 
 /**
- * Java 25 Pattern Matching Utilities
+ * Java 21 LTS Pattern Matching Utilities
  * 
- * Demonstrates Java 25 features in pattern matching:
+ * Demonstrates Java 21 LTS features in pattern matching:
  * - Enhanced instanceof patterns
  * - Improved switch pattern matching with guards
  * - Records for data validation
  * 
  * These utilities provide cleaner, more expressive code for common
- * test automation checks and validations using Java 25 features.
+ * test automation checks and validations using Java 21 LTS features.
  * 
- * @since Java 21+ (Pattern Matching), Java 25 (Advanced features)
+ * @since Java 21 LTS (Pattern Matching & Advanced features)
  * @author Automation Framework Team
  */
 public class PatternMatchingUtils {
 
     /**
-     * Java 25: Enhanced pattern matching for element state verification
+     * Java 21 LTS: Enhanced pattern matching for element state verification
      * 
      * Example:
      * 
@@ -27,7 +27,7 @@ public class PatternMatchingUtils {
      * </pre>
      */
     public static String describeElementState(Object obj) {
-        // Java 25 pattern matching with guards
+        // Java 21 LTS pattern matching with guards
         return switch (obj) {
             case String s when s.isEmpty() -> "Empty text content";
             case String s when s.length() > 100 -> "Long text content (" + s.length() + " chars)";

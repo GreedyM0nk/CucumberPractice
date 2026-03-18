@@ -1,9 +1,9 @@
 package com.retail.utils;
 
 /**
- * Java 25 Text Blocks and String Formatting Utilities
+ * Java 21 LTS Text Blocks and String Formatting Utilities
  * 
- * Demonstrates Java 25 improvements in text blocks:
+ * Demonstrates Java 21 LTS improvements in text blocks:
  * - Multi-line string literals (Java 15+)
  * - String formatting with .formatted() (Java 21+)
  * - Advanced formatting for HTML, JSON, and other text formats
@@ -11,13 +11,13 @@ package com.retail.utils;
  * Text blocks improve readability for multi-line string content like
  * error messages, JSON payloads, and HTML templates.
  * 
- * @since Java 15+ (Text Blocks), Java 21+ (Formatting), Java 25 (Enhanced)
+ * @since Java 15+ (Text Blocks), Java 21 LTS (Formatting)
  * @author Automation Framework Team
  */
 public class TextBlockUtils {
 
     /**
-     * Generate a formatted test report using Java 25 text blocks
+     * Generate a formatted test report using Java 21 LTS text blocks
      */
     public static String generateTestReportHeader(String testName, String environment, String timestamp) {
         return """
@@ -27,8 +27,8 @@ public class TextBlockUtils {
                 ║ Test Name      : %s
                 ║ Environment    : %s
                 ║ Timestamp      : %s
-                ║ Java Version   : 25
-                ║ Framework      : Retail Automation (Java 25)
+                ║ Java Version   : 21 LTS
+                ║ Framework      : Retail Automation (Java 21 LTS)
                 ╚════════════════════════════════════════════════════════════╝""".formatted(testName, environment,
                 timestamp);
     }
