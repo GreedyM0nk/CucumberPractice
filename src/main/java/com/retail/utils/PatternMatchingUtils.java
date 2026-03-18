@@ -9,7 +9,7 @@ package com.retail.utils;
  * - Records for data validation
  * 
  * These utilities provide cleaner, more expressive code for common
- * test automation checks and validations without Java 25 preview features.
+ * test automation checks and validations using Java 21+ features.
  * 
  * @since Java 21
  * @author Automation Framework Team
@@ -177,7 +177,7 @@ public class PatternMatchingUtils {
 
     /**
      * Java 21: Element state validation
-     * Simple alternative to pattern matching on tuples (Java 25 feature)
+     * Simple alternative to pattern matching on tuples (Java 21+ feature)
      */
     public static String evaluateElementState(int visibility, boolean enabled, String text) {
         // Conditional logic (Java 21 compatible)

@@ -25,17 +25,16 @@ public class TestDataRecords {
      * Replaces traditional TestConfig class with 10+ lines of boilerplate code
      */
     public record TestConfig(
-        String baseUrl,
-        String browserType,
-        boolean headless,
-        int implicitWaitSeconds,
-        int explicitWaitSeconds,
-        int parallelThreads,
-        boolean enableVirtualThreads,
-        String environment
-    ) {
+            String baseUrl,
+            String browserType,
+            boolean headless,
+            int implicitWaitSeconds,
+            int explicitWaitSeconds,
+            int parallelThreads,
+            boolean enableVirtualThreads,
+            String environment) {
         /**
-         * Custom compact constructor for validation (Java 25 feature)
+         * Custom compact constructor for validation (Java 21+ feature)
          */
         public TestConfig {
             if (baseUrl == null || baseUrl.isEmpty()) {
@@ -62,18 +61,17 @@ public class TestDataRecords {
      * Tracks performance and execution data
      */
     public record TestMetrics(
-        String testName,
-        String testClass,
-        LocalDateTime startTime,
-        LocalDateTime endTime,
-        long durationMs,
-        boolean passed,
-        String failureReason,
-        int retryAttempts,
-        String environment,
-        String browserVersion,
-        String osVersion
-    ) {
+            String testName,
+            String testClass,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            long durationMs,
+            boolean passed,
+            String failureReason,
+            int retryAttempts,
+            String environment,
+            String browserVersion,
+            String osVersion) {
         /**
          * Calculate percentage of total suite time
          */
@@ -109,12 +107,11 @@ public class TestDataRecords {
      * Type-safe representation of element selectors
      */
     public record ElementLocator(
-        String locatorType,
-        String locatorValue,
-        String elementName,
-        boolean optional,
-        boolean waitForVisibility
-    ) {
+            String locatorType,
+            String locatorValue,
+            String elementName,
+            boolean optional,
+            boolean waitForVisibility) {
         /**
          * Validate locator values
          */
@@ -137,25 +134,25 @@ public class TestDataRecords {
      * Comprehensive test execution report
      */
     public record TestReport(
-        String reportId,
-        LocalDateTime executionDate,
-        String reportTitle,
-        int totalTests,
-        int passedTests,
-        int failedTests,
-        int skippedTests,
-        long totalExecutionTime,
-        String environment,
-        String javaVersion,
-        List<TestMetrics> testMetrics,
-        boolean parallelExecutionEnabled,
-        int parallellThreadCount
-    ) {
+            String reportId,
+            LocalDateTime executionDate,
+            String reportTitle,
+            int totalTests,
+            int passedTests,
+            int failedTests,
+            int skippedTests,
+            long totalExecutionTime,
+            String environment,
+            String javaVersion,
+            List<TestMetrics> testMetrics,
+            boolean parallelExecutionEnabled,
+            int parallellThreadCount) {
         /**
          * Calculate pass rate percentage
          */
         public double getPassRate() {
-            if (totalTests == 0) return 0;
+            if (totalTests == 0)
+                return 0;
             return (passedTests * 100.0) / totalTests;
         }
 
@@ -163,30 +160,33 @@ public class TestDataRecords {
          * Get average test duration
          */
         public long getAverageTestDuration() {
-            if (testMetrics == null || testMetrics.isEmpty()) return 0;
+            if (testMetrics == null || testMetrics.isEmpty())
+                return 0;
             return testMetrics.stream()
-                .mapToLong(TestMetrics::durationMs)
-                .sum() / testMetrics.size();
+                    .mapToLong(TestMetrics::durationMs)
+                    .sum() / testMetrics.size();
         }
 
         /**
          * Get slowest test
          */
         public TestMetrics getSlowestTest() {
-            if (testMetrics == null || testMetrics.isEmpty()) return null;
+            if (testMetrics == null || testMetrics.isEmpty())
+                return null;
             return testMetrics.stream()
-                .max((t1, t2) -> Long.compare(t1.durationMs(), t2.durationMs()))
-                .orElse(null);
+                    .max((t1, t2) -> Long.compare(t1.durationMs(), t2.durationMs()))
+                    .orElse(null);
         }
 
         /**
          * Get fastest test
          */
         public TestMetrics getFastestTest() {
-            if (testMetrics == null || testMetrics.isEmpty()) return null;
+            if (testMetrics == null || testMetrics.isEmpty())
+                return null;
             return testMetrics.stream()
-                .min((t1, t2) -> Long.compare(t1.durationMs(), t2.durationMs()))
-                .orElse(null);
+                    .min((t1, t2) -> Long.compare(t1.durationMs(), t2.durationMs()))
+                    .orElse(null);
         }
     }
 
@@ -195,15 +195,14 @@ public class TestDataRecords {
      * Type-safe browser configuration
      */
     public record BrowserCapability(
-        String browserName,
-        String browserVersion,
-        String platformName,
-        boolean acceptInsecureCerts,
-        int pageLoadStrategy,  // 0: normal, 1: eager, 2: none
-        boolean strictFileInteractability
-    ) {
+            String browserName,
+            String browserVersion,
+            String platformName,
+            boolean acceptInsecureCerts,
+            int pageLoadStrategy, // 0: normal, 1: eager, 2: none
+            boolean strictFileInteractability) {
         /**
-         * Convenience static factories (Java 25 feature)
+         * Convenience static factories (Java 21+ feature)
          */
         public static BrowserCapability chromeHeadless() {
             return new BrowserCapability("chrome", "latest", "linux", true, 0, false);
@@ -223,22 +222,18 @@ public class TestDataRecords {
      * Encapsulates wait configuration
      */
     public record WaitStrategy(
-        String strategyType,  // element, url, javascript, condition
-        long timeoutMs,
-        long pollIntervalMs,
-        String conditionDescription
-    ) {
+            String strategyType, // element, url, javascript, condition
+            long timeoutMs,
+            long pollIntervalMs,
+            String conditionDescription) {
         /**
-         * Standard wait strategies as static fields (Java 25)
+         * Standard wait strategies as static fields (Java 21+)
          */
-        public static final WaitStrategy QUICK = 
-            new WaitStrategy("element", 5000, 500, "Quick 5-second wait");
-        
-        public static final WaitStrategy STANDARD = 
-            new WaitStrategy("element", 10000, 500, "Standard 10-second wait");
-        
-        public static final WaitStrategy LONG = 
-            new WaitStrategy("element", 30000, 1000, "Long 30-second wait");
+        public static final WaitStrategy QUICK = new WaitStrategy("element", 5000, 500, "Quick 5-second wait");
+
+        public static final WaitStrategy STANDARD = new WaitStrategy("element", 10000, 500, "Standard 10-second wait");
+
+        public static final WaitStrategy LONG = new WaitStrategy("element", 30000, 1000, "Long 30-second wait");
 
         /**
          * Convert timeout to seconds
@@ -253,22 +248,21 @@ public class TestDataRecords {
      * Comprehensive failure information
      */
     public record FailureDetails(
-        String testName,
-        String failureType,  // assertion, timeout, exception, navigation
-        String failureMessage,
-        String stackTrace,
-        String screenshotPath,
-        String pageSourcLog,
-        LocalDateTime failureTime,
-        int lineNumber,
-        String sourceFile
-    ) {
+            String testName,
+            String failureType, // assertion, timeout, exception, navigation
+            String failureMessage,
+            String stackTrace,
+            String screenshotPath,
+            String pageSourcLog,
+            LocalDateTime failureTime,
+            int lineNumber,
+            String sourceFile) {
         /**
          * Check if failure is recoverable (retry-able)
          */
         public boolean isRecoverable() {
-            return failureType.equalsIgnoreCase("timeout") || 
-                   failureType.equalsIgnoreCase("temporary_error");
+            return failureType.equalsIgnoreCase("timeout") ||
+                    failureType.equalsIgnoreCase("temporary_error");
         }
     }
 }

@@ -7,11 +7,15 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Properties;
 
 public class DriverFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(DriverFactory.class);
 
     /**
      * Private ThreadLocal – one WebDriver instance per thread.
@@ -41,9 +45,9 @@ public class DriverFactory {
         // Read headless from properties, but override with CI environment
         boolean headless = isCIEnvironment || Boolean.parseBoolean(prop.getProperty("headless", "false"));
 
-        System.out.println("Browser name is: " + browserName);
-        System.out.println("CI Environment: " + isCIEnvironment);
-        System.out.println("Headless mode: " + headless);
+        logger.info("Browser name is: {}", browserName);
+        logger.info("CI Environment: {}", isCIEnvironment);
+        logger.info("Headless mode: {}", headless);
 
         tlDriver.set(createLocalDriver(browserName, headless));
 

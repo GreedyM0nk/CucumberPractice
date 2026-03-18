@@ -3,6 +3,8 @@ package com.retail.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test Data Provider Utility
@@ -18,6 +20,8 @@ import java.util.Properties;
  * @author Automation Framework Team
  */
 public class TestDataProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestDataProvider.class);
     
     private static Properties testData;
     private static boolean initialized = false;
@@ -47,7 +51,7 @@ public class TestDataProvider {
             
             testData.load(input);
             initialized = true;
-            System.out.println("[TestDataProvider] Loaded " + testData.size() + " test data properties");
+            logger.info("Loaded {} test data properties", testData.size());
             
         } catch (IOException e) {
             throw new RuntimeException(
